@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==============================
+// ENUMS
+// ==============================
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+enum StatusPembayaran {
+  BELUM
+  MENUNGGU_VERIFIKASI
+  VALID
+  INVALID
+}
+
+enum StatusPesanan {
+  MENUNGGU_DP
+  DIPROSES
+  MENUNGGU_PELUNASAN
+  SELESAI
+}
+
+enum JenisPembayaran {
+  DP
+  PELUNASAN
+}
+
+// ==============================
+// MODELS
+// ==============================
+
+model User {
+  id_user  Int     @id @default(autoincrement())
+  nama     String
+  email    String  @unique
+  password String
+  no_hp    String
+  alamat   String?
+  role     Role    @default(CUSTOMER)
+
+  pesanan Pesanan[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Produk {
+  id_produk           Int     @id @default(autoincrement())
+  nama_produk         String
+  deskripsi           String
+  harga               Int
+  estimasi_pengerjaan Int
+  bahan               String
+  foto                String?
+
+  pesanan Pesanan[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Pesanan {
+  id_pesanan   Int @id @default(autoincrement())
+  id_user      Int
+  id_produk    Int
+  qty          Int
+  harga_satuan Int
+  total_harga  Int
+  dp_wajib     Int
+
+  dp_status        StatusPembayaran @default(BELUM)
+  pelunasan_status StatusPembayaran @default(BELUM)
+  status_pesanan   StatusPesanan    @default(MENUNGGU_DP)
+
+  tanggal_pesan DateTime @default(now())
+
+  user      User                  @relation(fields: [id_user], references: [id_user])
+  produk    Produk                @relation(fields: [id_produk], references: [id_produk])
+  transaksi TransaksiPembayaran[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model TransaksiPembayaran {
+  id_transaksi Int @id @default(autoincrement())
+  id_pesanan   Int
+
+  jenis_pembayaran  JenisPembayaran
+  jumlah            Int
+  bukti_transfer    String
+  status_verifikasi StatusPembayaran @default(MENUNGGU_VERIFIKASI)
+  tanggal_upload    DateTime         @default(now())
+
+  pesanan Pesanan @relation(fields: [id_pesanan], references: [id_pesanan])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
