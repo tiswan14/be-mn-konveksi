@@ -4,7 +4,7 @@ import morgan from "morgan";
 
 // routes
 import authRoutes from "./routes/auth.routes.js";
-// import produkRoutes from "./routes/produk.routes.js";
+import produkRoutes from "./routes/produk.routes.js"
 // import pesananRoutes from "./routes/pesanan.routes.js";
 
 const app = express();
@@ -19,13 +19,12 @@ app.get("/", (req, res) => {
         status: "success",
         author: "MN Konveksi Backend",
         description: "API backend untuk manajemen produk, pesanan, pembayaran DP & pelunasan.",
-        docs: "/auth | /produk | /pesanan"
     });
 });
 
 // ROUTES
 app.use("/api/auth", authRoutes);
-// app.use("/produk", produkRoutes);
+app.use("/api/produk", produkRoutes);
 // app.use("/pesanan", pesananRoutes);
 
 export default app;

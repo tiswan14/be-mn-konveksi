@@ -1,11 +1,10 @@
 import { verifyToken } from "../utils/jwt.js";
 
-export const auth = (roles = []) => {
+export const auth = () => {
     return (req, res, next) => {
         try {
             const header = req.headers.authorization;
 
-            // Tidak ada token
             if (!header) {
                 return res.status(401).json({
                     success: false,
@@ -13,7 +12,6 @@ export const auth = (roles = []) => {
                 });
             }
 
-            // Format harus "Bearer <token>"
             const parts = header.split(" ");
             if (parts.length !== 2 || parts[0] !== "Bearer") {
                 return res.status(401).json({
@@ -24,21 +22,13 @@ export const auth = (roles = []) => {
 
             const token = parts[1];
 
-            // Verifikasi token
+            // Verify token
             const decoded = verifyToken(token);
 
-            // Role-based authorization (opsional)
-            if (roles.length > 0 && !roles.includes(decoded.role)) {
-                return res.status(403).json({
-                    success: false,
-                    message: "Forbidden",
-                });
-            }
-
-            // Simpan payload token
+            // Save payload
             req.user = decoded;
 
-            return next();
+            next();
         } catch (err) {
             return res.status(401).json({
                 success: false,
