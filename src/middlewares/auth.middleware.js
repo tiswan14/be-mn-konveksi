@@ -4,21 +4,46 @@ export const auth = (roles = []) => {
     return (req, res, next) => {
         try {
             const header = req.headers.authorization;
+
+            // Tidak ada token
             if (!header) {
-                return res.status(401).json({ message: "Token required" });
+                return res.status(401).json({
+                    success: false,
+                    message: "Token required",
+                });
             }
 
-            const token = header.split(" ")[1];
+            // Format harus "Bearer <token>"
+            const parts = header.split(" ");
+            if (parts.length !== 2 || parts[0] !== "Bearer") {
+                return res.status(401).json({
+                    success: false,
+                    message: "Invalid authorization format",
+                });
+            }
+
+            const token = parts[1];
+
+            // Verifikasi token
             const decoded = verifyToken(token);
 
-            if (roles.length && !roles.includes(decoded.role)) {
-                return res.status(403).json({ message: "Forbidden" });
+            // Role-based authorization (opsional)
+            if (roles.length > 0 && !roles.includes(decoded.role)) {
+                return res.status(403).json({
+                    success: false,
+                    message: "Forbidden",
+                });
             }
 
+            // Simpan payload token
             req.user = decoded;
-            next();
+
+            return next();
         } catch (err) {
-            return res.status(401).json({ message: "Invalid token" });
+            return res.status(401).json({
+                success: false,
+                message: "Invalid or expired token",
+            });
         }
     };
 };

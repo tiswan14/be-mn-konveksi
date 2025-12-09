@@ -24,7 +24,7 @@ app.get("/", (req, res) => {
 });
 
 // ROUTES
-app.use("/auth", authRoutes);
+app.use("/api/auth", authRoutes);
 // app.use("/produk", produkRoutes);
 // app.use("/pesanan", pesananRoutes);
 

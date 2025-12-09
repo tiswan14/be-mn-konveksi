@@ -1,0 +1,100 @@
+{
+    "info": {
+        "_postman_id": "mn-konveksi-auth-api",
+        "name": "MN-Konveksi Auth API",
+        "description": "Authentication API for MN-Konveksi (Register, Login, Me)",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Register",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"nama\": \"Tiswan\",\n    \"email\": \"tiswan@example.com\",\n    \"password\": \"123456\",\n    \"no_hp\": \"081234567890\",\n    \"alamat\": \"Tasikmalaya\"\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:5000/api/auth/register",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5000",
+                    "path": [
+                        "api",
+                        "auth",
+                        "register"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Login",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\": \"tiswan@example.com\",\n    \"password\": \"123456\"\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:5000/api/auth/login",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5000",
+                    "path": [
+                        "api",
+                        "auth",
+                        "login"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Me (Get Profile)",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{token}}",
+                        "description": "Paste your JWT token here after login"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:5000/api/auth/me",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5000",
+                    "path": [
+                        "api",
+                        "auth",
+                        "me"
+                    ]
+                }
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "token",
+            "value": ""
+        }
+    ]
+}
