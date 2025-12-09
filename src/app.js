@@ -8,6 +8,7 @@ import rateLimit from "express-rate-limit";
 import authRoutes from "./routes/auth.routes.js";
 import produkRoutes from "./routes/produk.routes.js";
 import pesananRoutes from "./routes/pesanan.routes.js";
+import transaksiRoutes from "./routes/transaksi.routes.js";
 
 const app = express();
 
@@ -72,5 +73,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/produk", produkRoutes);
 app.use("/api/pesanan", pesananRoutes);
+app.use("/api/transaksi", transaksiRoutes);
+
 
 export default app;

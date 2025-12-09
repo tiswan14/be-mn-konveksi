@@ -1,0 +1,312 @@
+{
+    "info": {
+        "_postman_id": "mn-konveksi-api",
+        "name": "MN-Konveksi API",
+        "description": "Authentication, Produk, Pesanan, dan Transaksi Pembayaran API untuk MN-Konveksi",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Register",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"nama\": \"Tiswan\",\n    \"email\": \"tiswan@example.com\",\n    \"password\": \"123456\",\n    \"no_hp\": \"081234567890\",\n    \"alamat\": \"Tasikmalaya\"\n}"
+                        },
+                        "url": "http://localhost:5000/api/auth/register"
+                    }
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"tiswan@example.com\",\n    \"password\": \"123456\"\n}"
+                        },
+                        "url": "http://localhost:5000/api/auth/login"
+                    }
+                },
+                {
+                    "name": "Me (Get Profile)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "http://localhost:5000/api/auth/me"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Produk",
+            "item": [
+                {
+                    "name": "Create Produk",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "nama_produk",
+                                    "value": "Kaos Polos Hitam",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "deskripsi",
+                                    "value": "Kaos bahan cotton combed 30s",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "harga",
+                                    "value": "75000",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "estimasi_pengerjaan",
+                                    "value": "3",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "bahan",
+                                    "value": "Cotton Combed",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "foto",
+                                    "type": "file",
+                                    "src": ""
+                                }
+                            ]
+                        },
+                        "url": "http://localhost:5000/api/produk"
+                    }
+                },
+                {
+                    "name": "Get All Produk",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:5000/api/produk"
+                    }
+                },
+                {
+                    "name": "Get Produk by ID",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:5000/api/produk/1"
+                    }
+                },
+                {
+                    "name": "Update Produk",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "nama_produk",
+                                    "value": "Kaos Polos Update",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "deskripsi",
+                                    "value": "Update bahan cotton combed",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "harga",
+                                    "value": "80000",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "estimasi_pengerjaan",
+                                    "value": "4",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "bahan",
+                                    "value": "Combed 24s",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "foto",
+                                    "type": "file",
+                                    "src": ""
+                                }
+                            ]
+                        },
+                        "url": "http://localhost:5000/api/produk/1"
+                    }
+                },
+                {
+                    "name": "Delete Produk",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "http://localhost:5000/api/produk/1"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Pesanan",
+            "item": [
+                {
+                    "name": "Create Pesanan",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"id_produk\": 1,\n  \"qty\": 2,\n  \"harga_satuan\": 75000\n}"
+                        },
+                        "url": "http://localhost:5000/api/pesanan"
+                    }
+                },
+                {
+                    "name": "Get Pesanan Saya",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "http://localhost:5000/api/pesanan/me"
+                    }
+                },
+                {
+                    "name": "Get Detail Pesanan",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "http://localhost:5000/api/pesanan/1"
+                    }
+                },
+                {
+                    "name": "Update Status Pesanan (Admin)",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status_pesanan\": \"DIPROSES\"\n}"
+                        },
+                        "url": "http://localhost:5000/api/pesanan/1/status"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Transaksi",
+            "item": [
+                {
+                    "name": "Create Payment (DP / Pelunasan)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"id_pesanan\": 1,\n  \"jenis_pembayaran\": \"DP\",\n  \"jumlah\": 75000\n}"
+                        },
+                        "url": "http://localhost:5000/api/transaksi/create"
+                    }
+                },
+                {
+                    "name": "Midtrans Webhook (PUBLIC)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"order_id\": \"EXAMPLE_ORDER\",\n  \"transaction_status\": \"settlement\"\n}"
+                        },
+                        "url": "http://localhost:5000/api/transaksi/webhook"
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "token",
+            "value": ""
+        }
+    ]
+}

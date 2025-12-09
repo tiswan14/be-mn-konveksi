@@ -52,7 +52,6 @@ model User {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  // INDEX
   @@index([role])
 }
 
@@ -70,7 +69,6 @@ model Produk {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  // INDEX
   @@index([nama_produk])
   @@index([harga])
 }
@@ -97,7 +95,6 @@ model Pesanan {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  // INDEX
   @@index([id_user])
   @@index([id_produk])
   @@index([status_pesanan])
@@ -110,20 +107,30 @@ model TransaksiPembayaran {
   id_transaksi Int @id @default(autoincrement())
   id_pesanan   Int
 
-  jenis_pembayaran  JenisPembayaran
-  jumlah            Int
-  bukti_transfer    String
-  status_verifikasi StatusPembayaran @default(MENUNGGU_VERIFIKASI)
-  tanggal_upload    DateTime         @default(now())
+  jenis_pembayaran JenisPembayaran
+  jumlah           Int
+
+  // ============================
+  // FIELD MIDTRANS ONLY
+  // ============================
+  midtrans_order_id        String    @unique
+  midtrans_transaction_id  String?
+  midtrans_payment_type    String?
+  midtrans_va_number       String?
+  midtrans_qr_url          String? // untuk QRIS
+  midtrans_redirect_url    String? // GoPay / card
+  midtrans_status          String? // pending, deny, expire, settlement, cancel
+  midtrans_settlement_time DateTime?
 
   pesanan Pesanan @relation(fields: [id_pesanan], references: [id_pesanan])
+
+  tanggal_upload DateTime @default(now())
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  // INDEX
   @@index([id_pesanan])
   @@index([jenis_pembayaran])
-  @@index([status_verifikasi])
-  @@index([tanggal_upload])
+  @@index([midtrans_order_id])
+  @@index([midtrans_status])
 }

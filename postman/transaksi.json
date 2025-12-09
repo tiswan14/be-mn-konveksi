@@ -1,0 +1,68 @@
+{
+    "info": {
+        "_postman_id": "mn-konveksi-midtrans",
+        "name": "MN-Konveksi Midtrans API",
+        "description": "Testing pembayaran DP & Pelunasan via Midtrans (Snap API)",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Create Payment - DP",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_pesanan\": 1,\n  \"jenis_pembayaran\": \"DP\"\n}"
+                },
+                "url": "http://localhost:5000/api/transaksi/create"
+            }
+        },
+        {
+            "name": "Create Payment - PELUNASAN",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_pesanan\": 1,\n  \"jenis_pembayaran\": \"PELUNASAN\"\n}"
+                },
+                "url": "http://localhost:5000/api/transaksi/create"
+            }
+        },
+        {
+            "name": "Midtrans Webhook (manual test)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"transaction_status\": \"settlement\",\n  \"order_id\": \"PESANAN-1-DP-1736540000000\",\n  \"payment_type\": \"qris\"\n}"
+                },
+                "url": "http://localhost:5000/api/transaksi/webhook"
+            }
+        },
+        {
+            "name": "Check Pesanan",
+            "request": {
+                "method": "GET",
+                "url": "http://localhost:5000/api/pesanan/1"
+            }
+        }
+    ]
+}
