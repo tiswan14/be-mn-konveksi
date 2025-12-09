@@ -1,6 +1,22 @@
 import express from "express";
+import {
+    createPesanan,
+    getPesananUser,
+    getDetailPesanan,
+    updateStatusPesanan,
+} from "../controllers/pesanan.controller.js";
+
+import { auth } from "../middlewares/auth.middleware.js";
+import { requireAdmin } from "../middlewares/role.middleware.js";
+
 const router = express.Router();
 
-router.get("/", (req, res) => res.send("Pesanan route OK"));
+// CUSTOMER
+router.post("/", auth(), createPesanan);
+router.get("/me", auth(), getPesananUser);
+router.get("/:id", auth(), getDetailPesanan);
+
+// ADMIN ONLY
+router.patch("/:id/status", auth(), requireAdmin, updateStatusPesanan);
 
 export default router;

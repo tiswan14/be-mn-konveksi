@@ -1,3 +1,97 @@
-export const testPesanan = (req, res) => {
-    res.send("pesanan controller OK");
+import prisma from "../prisma/client.js";
+import pesananService from "../services/pesanan.service.js";
+export const createPesanan = async (req, res) => {
+    try {
+        const { id_produk, qty, harga_satuan } = req.body;
+        const { id, role } = req.user;
+
+        // ❌ ADMIN tidak boleh membuat pesanan
+        if (role === "ADMIN") {
+            return res.status(403).json({
+                success: false,
+                message: "Admin tidak diperbolehkan membuat pesanan",
+            });
+        }
+
+        // 🔍 VALIDASI PRODUK ADA
+        const produk = await prisma.produk.findUnique({
+            where: { id_produk: Number(id_produk) }
+        });
+
+        if (!produk) {
+            return res.status(404).json({
+                success: false,
+                message: "Produk tidak ditemukan",
+            });
+        }
+
+        // ➕ Lanjut membuat pesanan
+        const pesanan = await pesananService.createPesanan({
+            id_user: id,
+            id_produk,
+            qty,
+            harga_satuan,
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "Pesanan berhasil dibuat",
+            data: pesanan,
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+
+export const getPesananUser = async (req, res) => {
+    try {
+        const id_user = req.user.id;
+        const data = await pesananService.getPesananUser(id_user);
+
+        return res.json({
+            success: true,
+            data,
+        });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export const getDetailPesanan = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const data = await pesananService.getDetailPesanan(Number(id));
+
+        return res.json({
+            success: true,
+            data,
+        });
+    } catch (error) {
+        return res.status(404).json({ success: false, message: error.message });
+    }
+};
+
+export const updateStatusPesanan = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status_pesanan } = req.body;
+
+        const data = await pesananService.updateStatus(Number(id), {
+            status_pesanan,
+        });
+
+        return res.json({
+            success: true,
+            message: "Status pesanan diperbarui",
+            data,
+        });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
 };
