@@ -1,6 +1,7 @@
 import {
     registerService,
     loginService,
+    logoutService,
     meService,
 } from "../services/auth.service.js";
 
@@ -73,5 +74,15 @@ export const me = async (req, res) => {
             success: false,
             message: "Internal server error",
         });
+    }
+};
+
+
+export const logout = async (req, res) => {
+    try {
+        const result = await logoutService();
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 };

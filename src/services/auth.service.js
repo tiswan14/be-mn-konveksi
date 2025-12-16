@@ -74,3 +74,13 @@ export const meService = async (userId) => {
 
     return user;
 };
+
+// ======================================================
+// LOGOUT
+// ======================================================
+export const logoutService = async () => {
+    // Tidak perlu logic khusus karena JWT stateless
+    return {
+        message: "Logout berhasil",
+    };
+};
