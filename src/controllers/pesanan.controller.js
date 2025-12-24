@@ -95,3 +95,25 @@ export const updateStatusPesanan = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 };
+
+export const getPesananSummaryUser = async (req, res) => {
+    try {
+        const data = await pesananService.getSummaryUser(req.user.id);
+        res.json({ success: true, data });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+export const getPesananSummaryAdmin = async (req, res) => {
+    try {
+        if (req.user.role !== "ADMIN") {
+            return res.status(403).json({ success: false, message: "Akses ditolak" });
+        }
+
+        const data = await pesananService.getSummaryAdmin();
+        res.json({ success: true, data });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
