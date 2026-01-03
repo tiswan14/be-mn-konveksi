@@ -7,12 +7,11 @@ class PesananService {
     // ===============================
     async createPesanan({ id_user, id_produk, qty, harga_satuan }) {
 
-        if (!qty || qty <= 0) {
-            throw new Error("Qty harus lebih dari 0");
-        }
+        const produk = await pesananRepo.findProdukById(id_produk);
+        if (!produk) throw new Error("Produk tidak ditemukan");
 
         const total_harga = qty * harga_satuan;
-        const dp_wajib = Math.floor(total_harga * 0.5); // DP minimal 50%
+        const dp_wajib = Math.floor(total_harga * 0.5);
 
         return pesananRepo.create({
             id_user,
@@ -23,6 +22,7 @@ class PesananService {
             dp_wajib,
         });
     }
+
 
     // ===============================
     // PESANAN USER

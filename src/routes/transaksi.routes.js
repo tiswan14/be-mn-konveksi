@@ -1,13 +1,24 @@
 import { Router } from "express";
 import transaksiController from "../controllers/transaksi.controller.js";
+import { auth } from "../middlewares/auth.middleware.js";
+import { validate } from "../middlewares/validate.js";
+import { createTransaksiValidator } from "../validators/transaksi.validator.js";
 
 const router = Router();
 
-// CREATE PAYMENT DP / PELUNASAN
-router.post("/create", transaksiController.createPayment);
+// CREATE PAYMENT (WAJIB LOGIN)
+router.post(
+    "/create",
+    auth(),
+    createTransaksiValidator,
+    validate,
+    transaksiController.createPayment
+);
 
-// WEBHOOK (WAJIB PUBLIC)
-router.post("/webhook", transaksiController.midtransWebhook);
+// WEBHOOK (PUBLIC)
+router.post(
+    "/webhook",
+    transaksiController.midtransWebhook
+);
 
 export default router;
- 

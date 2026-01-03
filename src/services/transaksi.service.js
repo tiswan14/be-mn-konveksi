@@ -26,6 +26,19 @@ class TransaksiService {
 
         if (!pesanan) throw new Error("Pesanan tidak ditemukan.");
 
+        // 🔒 VALIDASI STATUS PESANAN
+        if (jenis_pembayaran === "DP" && pesanan.status_pesanan !== "MENUNGGU_DP") {
+            throw new Error("Pesanan tidak dalam status menunggu DP");
+        }
+
+        if (
+            jenis_pembayaran === "PELUNASAN" &&
+            pesanan.status_pesanan !== "MENUNGGU_PELUNASAN"
+        ) {
+            throw new Error("Pesanan belum bisa dilakukan pelunasan");
+        }
+
+
         const jumlah =
             jenis_pembayaran === "DP"
                 ? pesanan.dp_wajib

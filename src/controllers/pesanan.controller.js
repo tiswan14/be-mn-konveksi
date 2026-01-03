@@ -5,7 +5,6 @@ export const createPesanan = async (req, res) => {
         const { id_produk, qty, harga_satuan } = req.body;
         const { id, role } = req.user;
 
-        // ❌ ADMIN tidak boleh membuat pesanan
         if (role === "ADMIN") {
             return res.status(403).json({
                 success: false,
@@ -13,19 +12,6 @@ export const createPesanan = async (req, res) => {
             });
         }
 
-        // 🔍 VALIDASI PRODUK ADA
-        const produk = await prisma.produk.findUnique({
-            where: { id_produk: Number(id_produk) }
-        });
-
-        if (!produk) {
-            return res.status(404).json({
-                success: false,
-                message: "Produk tidak ditemukan",
-            });
-        }
-
-        // ➕ Lanjut membuat pesanan
         const pesanan = await pesananService.createPesanan({
             id_user: id,
             id_produk,
@@ -38,10 +24,8 @@ export const createPesanan = async (req, res) => {
             message: "Pesanan berhasil dibuat",
             data: pesanan,
         });
-
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({
+        return res.status(400).json({
             success: false,
             message: error.message,
         });
