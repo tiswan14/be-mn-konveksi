@@ -1,5 +1,7 @@
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
+import express from "express";
+import swaggerUiDist from "swagger-ui-dist";
 
 const swaggerSpec = swaggerJsdoc({
     definition: {
@@ -12,15 +14,17 @@ const swaggerSpec = swaggerJsdoc({
     apis: ["./src/docs/*.swagger.js"],
 });
 
-const CSS_URL =
-    "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui.min.css";
-
 export const swaggerDocs = (app) => {
+    const swaggerDistPath = swaggerUiDist.getAbsoluteFSPath();
+
+    // 🔑 INI WAJIB
+    app.use("/api-docs", express.static(swaggerDistPath));
+
     app.use(
         "/api-docs",
         swaggerUi.serve,
         swaggerUi.setup(swaggerSpec, {
-            customCssUrl: CSS_URL,
+            explorer: true,
         })
     );
 };
