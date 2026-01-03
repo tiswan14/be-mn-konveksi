@@ -15,13 +15,23 @@ import transaksiRoutes from "./routes/transaksi.routes.js";
 const app = express();
 
 // ===========================
+// TRUST PROXY (WAJIB UNTUK VERCEL)
+// ===========================
+app.set("trust proxy", 1);
+
+// ===========================
 // SECURITY MIDDLEWARE
 // ===========================
 app.use(helmet());
 
+// ===========================
+// RATE LIMIT
+// ===========================
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 200,
+    standardHeaders: true,
+    legacyHeaders: false,
     message: "Terlalu banyak request dari IP ini, coba lagi nanti.",
 });
 app.use(limiter);
@@ -34,11 +44,12 @@ const whitelist = [
     "http://localhost:3000",
     "http://localhost:5000",
     "https://mn-konveksi.vercel.app",
+    "https://be-mn-konveksi.vercel.app",
 ];
 
 app.use(
     cors({
-        origin: function (origin, callback) {
+        origin(origin, callback) {
             if (!origin || whitelist.includes(origin)) {
                 callback(null, true);
             } else {
@@ -68,7 +79,7 @@ app.get("/", (req, res) => {
 });
 
 // ===========================
-// SWAGGER UI (INI KUNCI)
+// SWAGGER UI
 // ===========================
 swaggerDocs(app);
 
