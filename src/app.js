@@ -4,7 +4,7 @@ import morgan from "morgan";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 
-import { swaggerDocs } from "./docs/swagger.js";
+import { swaggerSpec } from "./docs/swagger.js";
 
 // routes
 import authRoutes from "./routes/auth.routes.js";
@@ -20,7 +20,7 @@ const app = express();
 app.set("trust proxy", 1);
 
 // ===========================
-// SECURITY MIDDLEWARE
+// SECURITY
 // ===========================
 app.use(helmet());
 
@@ -79,9 +79,16 @@ app.get("/", (req, res) => {
 });
 
 // ===========================
-// SWAGGER UI
+// OPENAPI JSON (UNTUK SWAGGER UI CDN)
 // ===========================
-swaggerDocs(app);
+app.get("/openapi.json", (req, res) => {
+    // CORS khusus docs
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+    res.json(swaggerSpec);
+});
 
 // ===========================
 // ROUTES
