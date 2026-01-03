@@ -1,6 +1,10 @@
 import bcrypt from "bcryptjs";
-import prisma from "../prisma/client.js";
 import { signToken } from "../utils/jwt.js";
+import {
+    findUserByEmail,
+    createUser,
+    findUserById,
+} from "../repositories/auth.repository.js";
 
 // ======================================================
 // REGISTER
@@ -8,69 +12,72 @@ import { signToken } from "../utils/jwt.js";
 export const registerService = async (data) => {
     const { nama, email, password, no_hp, alamat } = data;
 
-    // Cek email sudah dipakai atau belum
-    const exist = await prisma.user.findUnique({
-        where: { email },
-    });
+    // cek email
+    const exist = await findUserByEmail(email);
     if (exist) {
         throw new Error("Email sudah digunakan");
     }
 
-    // Hash password
-    const hashed = await bcrypt.hash(password, 10);
+    // hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Simpan user
-    const user = await prisma.user.create({
-        data: {
-            nama,
-            email,
-            password: hashed,
-            no_hp,
-            alamat,
-            role: "CUSTOMER",
-        },
+    // simpan user
+    const user = await createUser({
+        nama,
+        email,
+        password: hashedPassword,
+        no_hp,
+        alamat,
+        role: "CUSTOMER",
     });
 
-    return user;
+    // hapus password dari response
+    const { password: _, ...safeUser } = user;
+
+    return safeUser;
 };
 
 // ======================================================
 // LOGIN
 // ======================================================
 export const loginService = async ({ email, password }) => {
-    // Cari user berdasarkan email
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await findUserByEmail(email);
 
-    if (!user) throw new Error("Akun tidak ditemukan");
+    // Pesan error GENERIC
+    const errorMessage = "Email atau password salah";
 
-    // Cocokkan password
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) throw new Error("Password salah");
+    if (!user) {
+        throw new Error(errorMessage);
+    }
 
-    // Generate token
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+        throw new Error(errorMessage);
+    }
+
     const token = signToken({
         id: user.id_user,
         role: user.role,
     });
 
-    return { user, token };
+    const { password: _, ...safeUser } = user;
+
+    return {
+        user: safeUser,
+        token,
+    };
 };
+
 
 // ======================================================
 // ME (PROFILE)
 // ======================================================
 export const meService = async (userId) => {
-    const user = await prisma.user.findUnique({
-        where: { id_user: userId },
-        select: {
-            id_user: true,
-            nama: true,
-            email: true,
-            role: true,
-            no_hp: true,
-            alamat: true,
-        },
-    });
+    const user = await findUserById(userId);
+
+    if (!user) {
+        throw new Error("User tidak ditemukan");
+    }
 
     return user;
 };
@@ -79,7 +86,6 @@ export const meService = async (userId) => {
 // LOGOUT
 // ======================================================
 export const logoutService = async () => {
-    // Tidak perlu logic khusus karena JWT stateless
     return {
         message: "Logout berhasil",
     };
