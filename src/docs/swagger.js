@@ -28,21 +28,12 @@ const swaggerSpec = swaggerJsdoc({
                 },
             },
         },
-        security: [
-            {
-                bearerAuth: [],
-            },
-        ],
+        security: [{ bearerAuth: [] }],
     },
     apis: ["./src/docs/*.swagger.js"],
 });
 
 export const swaggerDocs = (app) => {
-    // ❗ OPSIONAL: proteksi swagger di production
-    if (isProduction && process.env.ENABLE_SWAGGER !== "true") {
-        return;
-    }
-
     app.use(
         "/api-docs",
         swaggerUi.serve,
