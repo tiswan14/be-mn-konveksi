@@ -1,4 +1,5 @@
 import swaggerJsdoc from "swagger-jsdoc";
+import path from "path";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -28,5 +29,9 @@ export const swaggerSpec = swaggerJsdoc({
         },
         security: [{ bearerAuth: [] }],
     },
-    apis: ["./src/docs/*.swagger.js"],
+
+    // 🔥 INI KUNCINYA
+    apis: [
+        path.resolve("src/docs/*.swagger.js"),
+    ],
 });
