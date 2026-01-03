@@ -1,7 +1,7 @@
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-import express from "express";
-import swaggerUiDist from "swagger-ui-dist";
+
+const isProduction = process.env.NODE_ENV === "production";
 
 const swaggerSpec = swaggerJsdoc({
     definition: {
@@ -9,22 +9,46 @@ const swaggerSpec = swaggerJsdoc({
         info: {
             title: "MN Konveksi API",
             version: "1.0.0",
+            description: "API resmi MN Konveksi",
         },
+        servers: [
+            {
+                url: isProduction
+                    ? "https://be-mn-konveksi.vercel.app"
+                    : "http://localhost:5000",
+                description: isProduction ? "Production" : "Local",
+            },
+        ],
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: "http",
+                    scheme: "bearer",
+                    bearerFormat: "JWT",
+                },
+            },
+        },
+        security: [
+            {
+                bearerAuth: [],
+            },
+        ],
     },
     apis: ["./src/docs/*.swagger.js"],
 });
 
 export const swaggerDocs = (app) => {
-    const swaggerDistPath = swaggerUiDist.getAbsoluteFSPath();
-
-    // 🔑 INI WAJIB
-    app.use("/api-docs", express.static(swaggerDistPath));
+    // ❗ OPSIONAL: proteksi swagger di production
+    if (isProduction && process.env.ENABLE_SWAGGER !== "true") {
+        return;
+    }
 
     app.use(
         "/api-docs",
         swaggerUi.serve,
         swaggerUi.setup(swaggerSpec, {
             explorer: true,
+            customSiteTitle: "MN Konveksi API Docs",
         })
     );
 };

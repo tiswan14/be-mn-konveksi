@@ -32,6 +32,7 @@ app.use(limiter);
 const whitelist = [
     "http://localhost:5173",
     "http://localhost:3000",
+    "http://localhost:5000",
     "https://mn-konveksi.vercel.app",
 ];
 
