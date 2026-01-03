@@ -30,12 +30,24 @@ const options = {
         },
     },
 
-    // 🔥 INI KUNCI PEMISAHAN
     apis: ["./src/docs/*.swagger.js"],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
 
 export const swaggerDocs = (app) => {
-    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+    app.use(
+        "/api-docs",
+        swaggerUi.serve,
+        swaggerUi.setup(swaggerSpec, {
+            // 🔥 FIX UNTUK VERCEL (PAKAI CDN)
+            customCssUrl: "https://unpkg.com/swagger-ui-dist/swagger-ui.css",
+            customJs: "https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js",
+            customJsStr: `
+                window.onload = () => {
+                    console.log("Swagger UI loaded");
+                };
+            `,
+        })
+    );
 };
