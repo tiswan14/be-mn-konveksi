@@ -90,6 +90,9 @@ app.get("/", (req, res) => {
     });
 });
 
+app.use(express.static('public'));
+
+
 // ===========================
 // OPENAPI JSON (UNTUK SWAGGER UI CDN)
 // ===========================
