@@ -4,6 +4,8 @@ import morgan from "morgan";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 
+import { swaggerDocs } from "./docs/swagger.js";
+
 // routes
 import authRoutes from "./routes/auth.routes.js";
 import produkRoutes from "./routes/produk.routes.js";
@@ -15,28 +17,25 @@ const app = express();
 // ===========================
 // SECURITY MIDDLEWARE
 // ===========================
-
-// Helmet (mengatur header keamanan)
 app.use(helmet());
 
-// Rate limit (anti brute force & spam)
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 menit
-    max: 200, // max request per IP
+    windowMs: 15 * 60 * 1000,
+    max: 200,
     message: "Terlalu banyak request dari IP ini, coba lagi nanti."
 });
 app.use(limiter);
 
 // ===========================
-// CORS WHITELIST (HANYA IZINKAN React JS)
+// CORS
 // ===========================
 const whitelist = [
-    "http://localhost:5173",   // React Vite
-    "http://localhost:3000",   // React CRA
-    "https://mn-konveksi.vercel.app" // jika sudah online
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://mn-konveksi.vercel.app"
 ];
 
-const corsOptions = {
+app.use(cors({
     origin: function (origin, callback) {
         if (!origin || whitelist.includes(origin)) {
             callback(null, true);
@@ -45,9 +44,7 @@ const corsOptions = {
         }
     },
     credentials: true,
-};
-
-app.use(cors(corsOptions));
+}));
 
 // ===========================
 // BODY PARSER + LOGGER
@@ -56,7 +53,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 // ===========================
-// HOME ENDPOINT
+// HOME
 // ===========================
 app.get("/", (req, res) => {
     res.json({
@@ -75,5 +72,9 @@ app.use("/api/produk", produkRoutes);
 app.use("/api/pesanan", pesananRoutes);
 app.use("/api/transaksi", transaksiRoutes);
 
+// ===========================
+// SWAGGER
+// ===========================
+swaggerDocs(app);
 
 export default app;
