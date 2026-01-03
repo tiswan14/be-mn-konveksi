@@ -1,28 +1,26 @@
 import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
 
-const options = {
+const swaggerSpec = swaggerJsdoc({
     definition: {
         openapi: "3.0.0",
         info: {
             title: "MN Konveksi API",
             version: "1.0.0",
-            description: "Dokumentasi API MN Konveksi",
-        },
-        servers: [
-            { url: "https://be-mn-konveksi.vercel.app" },
-            { url: "http://localhost:5000" },
-        ],
-        components: {
-            securitySchemes: {
-                bearerAuth: {
-                    type: "http",
-                    scheme: "bearer",
-                    bearerFormat: "JWT",
-                },
-            },
         },
     },
     apis: ["./src/docs/*.swagger.js"],
-};
+});
 
-export const swaggerSpec = swaggerJsdoc(options);
+const CSS_URL =
+    "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui.min.css";
+
+export const swaggerDocs = (app) => {
+    app.use(
+        "/api-docs",
+        swaggerUi.serve,
+        swaggerUi.setup(swaggerSpec, {
+            customCssUrl: CSS_URL,
+        })
+    );
+};

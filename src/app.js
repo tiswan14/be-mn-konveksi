@@ -22,7 +22,7 @@ app.use(helmet());
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 200,
-    message: "Terlalu banyak request dari IP ini, coba lagi nanti."
+    message: "Terlalu banyak request dari IP ini, coba lagi nanti.",
 });
 app.use(limiter);
 
@@ -32,19 +32,21 @@ app.use(limiter);
 const whitelist = [
     "http://localhost:5173",
     "http://localhost:3000",
-    "https://mn-konveksi.vercel.app"
+    "https://mn-konveksi.vercel.app",
 ];
 
-app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || whitelist.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
-    credentials: true,
-}));
+app.use(
+    cors({
+        origin: function (origin, callback) {
+            if (!origin || whitelist.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
+        credentials: true,
+    })
+);
 
 // ===========================
 // BODY PARSER + LOGGER
@@ -64,14 +66,10 @@ app.get("/", (req, res) => {
     });
 });
 
-
-import { swaggerSpec } from "./swagger.js";
-
-app.get("/api-docs.json", (req, res) => {
-    res.setHeader("Content-Type", "application/json");
-    res.status(200).json(swaggerSpec);
-});
-
+// ===========================
+// SWAGGER UI (INI KUNCI)
+// ===========================
+swaggerDocs(app);
 
 // ===========================
 // ROUTES
@@ -80,10 +78,5 @@ app.use("/api/auth", authRoutes);
 app.use("/api/produk", produkRoutes);
 app.use("/api/pesanan", pesananRoutes);
 app.use("/api/transaksi", transaksiRoutes);
-
-// ===========================
-// SWAGGER
-// ===========================
-swaggerDocs(app);
 
 export default app;
