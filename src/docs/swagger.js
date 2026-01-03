@@ -1,5 +1,4 @@
 import swaggerJsdoc from "swagger-jsdoc";
-import swaggerUi from "swagger-ui-express";
 
 const options = {
     definition: {
@@ -26,15 +25,4 @@ const options = {
     apis: ["./src/docs/*.swagger.js"],
 };
 
-const swaggerSpec = swaggerJsdoc(options);
-
-export const swaggerDocs = (app) => {
-    app.use(
-        "/api-docs",
-        swaggerUi.serve,
-        swaggerUi.setup(swaggerSpec, {
-            customCssUrl: "https://unpkg.com/swagger-ui-dist/swagger-ui.css",
-            customJs: "https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js",
-        })
-    );
-};
+export const swaggerSpec = swaggerJsdoc(options);

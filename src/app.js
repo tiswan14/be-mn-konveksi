@@ -64,6 +64,15 @@ app.get("/", (req, res) => {
     });
 });
 
+
+import { swaggerSpec } from "./swagger.js";
+
+app.get("/api-docs.json", (req, res) => {
+    res.setHeader("Content-Type", "application/json");
+    res.status(200).json(swaggerSpec);
+});
+
+
 // ===========================
 // ROUTES
 // ===========================
