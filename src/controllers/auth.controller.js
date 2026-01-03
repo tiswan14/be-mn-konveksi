@@ -25,7 +25,7 @@ export const register = async (req, res) => {
         });
     } catch (err) {
         return res.status(400).json({
-            success: false,
+            success: false, 
             message: err.message,
         });
     }
