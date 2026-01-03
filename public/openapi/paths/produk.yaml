@@ -1,0 +1,97 @@
+/api/produk:
+    get:
+        summary: Ambil semua produk (pagination & search)
+        tags: [Produk]
+        parameters:
+            - in: query
+              name: page
+              schema:
+                  type: integer
+            - in: query
+              name: limit
+              schema:
+                  type: integer
+            - in: query
+              name: q
+              schema:
+                  type: string
+              description: Kata kunci pencarian
+        responses:
+            '200':
+                description: Data produk berhasil diambil
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
+                                data:
+                                    type: array
+                                    items:
+                                        $ref: '#/components/schemas/Produk'
+                                pagination:
+                                    type: object
+            '500':
+                description: Gagal mengambil data produk
+
+    post:
+        summary: Tambah produk baru (Admin)
+        tags: [Produk]
+        security:
+            - bearerAuth: []
+        requestBody:
+            required: true
+            content:
+                multipart/form-data:
+                    schema:
+                        type: object
+                        required:
+                            - nama_produk
+                            - deskripsi
+                            - harga
+                            - estimasi_pengerjaan
+                            - bahan
+                        properties:
+                            nama_produk:
+                                type: string
+                            deskripsi:
+                                type: string
+                            harga:
+                                type: integer
+                            estimasi_pengerjaan:
+                                type: integer
+                            bahan:
+                                type: string
+                            foto:
+                                type: string
+                                format: binary
+        responses:
+            '201':
+                description: Produk berhasil dibuat
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
+                                data:
+                                    $ref: '#/components/schemas/Produk'
+            '403':
+                description: Akses admin saja
+            '500':
+                description: Gagal membuat produk
+
+/api/produk/{id}:
+    get:
+        summary: Ambil detail produk
+        tags: [Produk]
+        parameters:
+            - in: path
+              name: id
+              required: true

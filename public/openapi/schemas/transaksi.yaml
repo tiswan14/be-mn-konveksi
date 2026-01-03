@@ -1,0 +1,59 @@
+Transaksi:
+    type: object
+    properties:
+        id_transaksi:
+            type: integer
+        id_pesanan:
+            type: integer
+        jenis_pembayaran:
+            type: string
+            enum: [DP, PELUNASAN]
+        jumlah:
+            type: integer
+        midtrans_order_id:
+            type: string
+        midtrans_redirect_url:
+            type: string
+        midtrans_payment_type:
+            type: string
+        midtrans_status:
+            type: string
+            enum: [pending, settlement, cancel, deny, expire, failure]
+        midtrans_settlement_time:
+            type: string
+            format: date-time
+            nullable: true
+        created_at:
+            type: string
+            format: date-time
+
+TransaksiCreate:
+    type: object
+    required: [id_pesanan, jenis_pembayaran]
+    properties:
+        id_pesanan:
+            type: integer
+        jenis_pembayaran:
+            type: string
+            enum: [DP, PELUNASAN]
+
+TransaksiSnapResponse:
+    type: object
+    properties:
+        order_id:
+            type: string
+        token:
+            type: string
+        redirect_url:
+            type: string
+
+MidtransWebhook:
+    type: object
+    description: Payload webhook dari Midtrans (disederhanakan)
+    properties:
+        order_id:
+            type: string
+        transaction_status:
+            type: string
+        payment_type:
+            type: string
