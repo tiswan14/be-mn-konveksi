@@ -10,14 +10,8 @@ const options = {
             description: "Dokumentasi API MN Konveksi",
         },
         servers: [
-            {
-                url: "https://be-mn-konveksi.vercel.app",
-                description: "Production server",
-            },
-            {
-                url: "http://localhost:5000",
-                description: "Local server",
-            },
+            { url: "https://be-mn-konveksi.vercel.app" },
+            { url: "http://localhost:5000" },
         ],
         components: {
             securitySchemes: {
@@ -29,7 +23,6 @@ const options = {
             },
         },
     },
-
     apis: ["./src/docs/*.swagger.js"],
 };
 
@@ -40,14 +33,8 @@ export const swaggerDocs = (app) => {
         "/api-docs",
         swaggerUi.serve,
         swaggerUi.setup(swaggerSpec, {
-            // 🔥 FIX UNTUK VERCEL (PAKAI CDN)
             customCssUrl: "https://unpkg.com/swagger-ui-dist/swagger-ui.css",
             customJs: "https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js",
-            customJsStr: `
-                window.onload = () => {
-                    console.log("Swagger UI loaded");
-                };
-            `,
         })
     );
 };
