@@ -1,0 +1,31 @@
+User:
+    type: object
+    properties:
+        id: { type: integer }
+        nama: { type: string }
+        email: { type: string }
+        role: { type: string }
+        created_at:
+            type: string
+            format: date-time
+
+UserRegister:
+    type: object
+    required: [nama, email, password, no_hp]
+    properties:
+        nama: { type: string }
+        email: { type: string }
+        password:
+            type: string
+            format: password
+        no_hp: { type: string }
+        alamat: { type: string }
+
+UserLogin:
+    type: object
+    required: [email, password]
+    properties:
+        email: { type: string }
+        password:
+            type: string
+            format: password

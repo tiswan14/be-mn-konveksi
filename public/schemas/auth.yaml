@@ -1,0 +1,13 @@
+/api/auth/register:
+    post:
+        summary: Register user baru
+        tags: [Auth]
+        requestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/UserRegister'
+        responses:
+            '201':
+                description: Registrasi berhasil

@@ -1,0 +1,42 @@
+Pesanan:
+    type: object
+    properties:
+        id_pesanan: { type: integer }
+        id_user: { type: integer }
+        id_produk: { type: integer }
+        qty: { type: integer }
+        harga_satuan: { type: integer }
+        total_harga: { type: integer }
+        dp_wajib: { type: integer }
+        status_pesanan:
+            type: string
+            enum: [MENUNGGU_DP, DIPROSES, MENUNGGU_PELUNASAN, SELESAI]
+        created_at:
+            type: string
+            format: date-time
+
+PesananCreate:
+    type: object
+    required: [id_produk, qty, harga_satuan]
+    properties:
+        id_produk: { type: integer }
+        qty:
+            type: integer
+            minimum: 1
+        harga_satuan: { type: integer }
+
+PesananSummaryUser:
+    type: object
+    properties:
+        total_pesanan: { type: integer }
+        menunggu_dp: { type: integer }
+        diproses: { type: integer }
+        menunggu_pelunasan: { type: integer }
+        selesai: { type: integer }
+
+PesananSummaryAdmin:
+    allOf:
+        - $ref: '#/PesananSummaryUser'
+        - type: object
+          properties:
+              total_pendapatan: { type: integer }

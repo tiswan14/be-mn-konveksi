@@ -1,0 +1,23 @@
+securitySchemes:
+    bearerAuth:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+
+schemas:
+    User:
+        $ref: ./schemas/user.yaml#/User
+    UserRegister:
+        $ref: ./schemas/user.yaml#/UserRegister
+    UserLogin:
+        $ref: ./schemas/user.yaml#/UserLogin
+    Produk:
+        $ref: ./schemas/produk.yaml#/Produk
+    Pesanan:
+        $ref: ./schemas/pesanan.yaml#/Pesanan
+    PesananCreate:
+        $ref: ./schemas/pesanan.yaml#/PesananCreate
+    PesananSummaryUser:
+        $ref: ./schemas/pesanan.yaml#/PesananSummaryUser
+    PesananSummaryAdmin:
+        $ref: ./schemas/pesanan.yaml#/PesananSummaryAdmin
