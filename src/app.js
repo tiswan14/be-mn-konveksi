@@ -47,7 +47,20 @@ const whitelist = [
     "https://be-mn-konveksi.vercel.app",
 ];
 
-app.use(
+app.use((req, res, next) => {
+    if (req.path === "/openapi.json") {
+        // Docs harus public
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+        if (req.method === "OPTIONS") {
+            return res.sendStatus(204);
+        }
+        return next();
+    }
+
+    // API pakai whitelist
     cors({
         origin(origin, callback) {
             if (!origin || whitelist.includes(origin)) {
@@ -57,9 +70,8 @@ app.use(
             }
         },
         credentials: true,
-    })
-);
-
+    })(req, res, next);
+});
 // ===========================
 // BODY PARSER + LOGGER
 // ===========================
@@ -82,13 +94,9 @@ app.get("/", (req, res) => {
 // OPENAPI JSON (UNTUK SWAGGER UI CDN)
 // ===========================
 app.get("/openapi.json", (req, res) => {
-    // CORS khusus docs
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
     res.json(swaggerSpec);
 });
+
 
 // ===========================
 // ROUTES
