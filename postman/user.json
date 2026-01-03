@@ -1,0 +1,103 @@
+{
+    "info": {
+        "_postman_id": "b1c7a8d1-9c8e-4c6f-bb3a-9a1a9f01abcd",
+        "name": "MN Konveksi - Admin User API",
+        "description": "Endpoint admin untuk manajemen user (get all, detail, update)",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Get All Users (Admin)",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{admin_token}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/admin/users",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "admin",
+                        "users"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get User Detail (Admin)",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{admin_token}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/admin/users/1",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "admin",
+                        "users",
+                        "1"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Update User (Admin)",
+            "request": {
+                "method": "PATCH",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{admin_token}}",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"nama\": \"User Update\",\n  \"no_hp\": \"081234567890\",\n  \"alamat\": \"Tasikmalaya\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/admin/users/1",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "admin",
+                        "users",
+                        "1"
+                    ]
+                }
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:5000"
+        },
+        {
+            "key": "admin_token",
+            "value": "ISI_DENGAN_JWT_ADMIN"
+        }
+    ]
+}

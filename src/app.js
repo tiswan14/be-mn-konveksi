@@ -8,6 +8,7 @@ import { swaggerSpec } from "./docs/swagger.js";
 
 // routes
 import authRoutes from "./routes/auth.routes.js";
+import userRoutes from "./routes/user.routes.js";
 import produkRoutes from "./routes/produk.routes.js";
 import pesananRoutes from "./routes/pesanan.routes.js";
 import transaksiRoutes from "./routes/transaksi.routes.js";
@@ -105,6 +106,7 @@ app.get("/openapi.json", (req, res) => {
 // ROUTES
 // ===========================
 app.use("/api/auth", authRoutes);
+app.use("/api", userRoutes);
 app.use("/api/produk", produkRoutes);
 app.use("/api/pesanan", pesananRoutes);
 app.use("/api/transaksi", transaksiRoutes);
