@@ -1,7 +1,7 @@
 import pesananService from "../services/pesanan.service.js";
 export const createPesanan = async (req, res) => {
     try {
-        const { id_produk, qty, harga_satuan } = req.body;
+        const { id_produk, qty, catatan } = req.body;
         const { id, role } = req.user;
 
         if (role === "ADMIN") {
@@ -15,7 +15,7 @@ export const createPesanan = async (req, res) => {
             id_user: id,
             id_produk,
             qty,
-            harga_satuan,
+            catatan
         });
 
         return res.status(201).json({

@@ -7,17 +7,11 @@ class PesananService {
     // ===============================
     async createPesanan({ id_user, id_produk, qty, catatan }) {
 
-        // ambil produk resmi dari DB
         const produk = await pesananRepo.findProdukById(id_produk);
-        if (!produk) {
-            throw new Error("Produk tidak ditemukan");
-        }
+        if (!produk) throw new Error("Produk tidak ditemukan");
 
-        if (qty < 1) {
-            throw new Error("Jumlah minimal 1");
-        }
+        if (qty < 1) throw new Error("Jumlah minimal 1");
 
-        // 🔒 harga dari DB, BUKAN dari FE
         const harga_satuan = produk.harga;
         const total_harga = harga_satuan * qty;
         const dp_wajib = Math.ceil(total_harga * 0.5);
@@ -33,8 +27,6 @@ class PesananService {
             status_pesanan: "MENUNGGU_DP"
         });
     }
-
-
 
     // ===============================
     // PESANAN USER
@@ -73,18 +65,10 @@ class PesananService {
         raw.forEach(item => {
             summary.total_pesanan += item._count._all;
 
-            if (item.status_pesanan === "MENUNGGU_DP") {
-                summary.menunggu_dp = item._count._all;
-            }
-            if (item.status_pesanan === "DIPROSES") {
-                summary.diproses = item._count._all;
-            }
-            if (item.status_pesanan === "MENUNGGU_PELUNASAN") {
-                summary.menunggu_pelunasan = item._count._all;
-            }
-            if (item.status_pesanan === "SELESAI") {
-                summary.selesai = item._count._all;
-            }
+            if (item.status_pesanan === "MENUNGGU_DP") summary.menunggu_dp = item._count._all;
+            if (item.status_pesanan === "DIPROSES") summary.diproses = item._count._all;
+            if (item.status_pesanan === "MENUNGGU_PELUNASAN") summary.menunggu_pelunasan = item._count._all;
+            if (item.status_pesanan === "SELESAI") summary.selesai = item._count._all;
         });
 
         return summary;
@@ -117,14 +101,6 @@ class PesananService {
 
         return summary;
     }
-
-    async findProdukById(id_produk) {
-        return prisma.produk.findUnique({
-            where: { id_produk }
-        });
-    }
-
-
 }
 
 export default new PesananService();

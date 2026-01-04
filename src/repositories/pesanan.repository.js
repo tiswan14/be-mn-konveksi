@@ -3,6 +3,15 @@ import prisma from "../prisma/client.js";
 class PesananRepository {
 
     // ===============================
+    // PRODUK (UNTUK PESANAN)
+    // ===============================
+    async findProdukById(id_produk) {
+        return prisma.produk.findUnique({
+            where: { id_produk }
+        });
+    }
+
+    // ===============================
     // CREATE
     // ===============================
     async create(data) {

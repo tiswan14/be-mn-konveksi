@@ -74,9 +74,12 @@ model Produk {
 }
 
 model Pesanan {
-  id_pesanan   Int @id @default(autoincrement())
-  id_user      Int
-  id_produk    Int
+  id_pesanan Int @id @default(autoincrement())
+
+  // 🔑 FOREIGN KEY
+  id_user   Int
+  id_produk Int
+
   qty          Int
   harga_satuan Int
   total_harga  Int
@@ -90,14 +93,17 @@ model Pesanan {
 
   tanggal_pesan DateTime @default(now())
 
-  user      User                  @relation(fields: [userId_user], references: [id_user])
-  produk    Produk                @relation(fields: [produkId_produk], references: [id_produk])
+  user   User   @relation(fields: [id_user], references: [id_user])
+  produk Produk @relation(fields: [id_produk], references: [id_produk])
+
   transaksi TransaksiPembayaran[]
 
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
-  userId_user     Int
-  produkId_produk Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([id_user])
+  @@index([id_produk])
+  @@index([status_pesanan])
 }
 
 model TransaksiPembayaran {
