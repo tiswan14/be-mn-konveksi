@@ -1,4 +1,3 @@
-import prisma from "../prisma/client.js";
 import pesananService from "../services/pesanan.service.js";
 export const createPesanan = async (req, res) => {
     try {

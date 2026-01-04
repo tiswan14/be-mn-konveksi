@@ -82,25 +82,22 @@ model Pesanan {
   total_harga  Int
   dp_wajib     Int
 
+  catatan String?
+
   dp_status        StatusPembayaran @default(BELUM)
   pelunasan_status StatusPembayaran @default(BELUM)
   status_pesanan   StatusPesanan    @default(MENUNGGU_DP)
 
   tanggal_pesan DateTime @default(now())
 
-  user      User                  @relation(fields: [id_user], references: [id_user])
-  produk    Produk                @relation(fields: [id_produk], references: [id_produk])
+  user      User                  @relation(fields: [userId_user], references: [id_user])
+  produk    Produk                @relation(fields: [produkId_produk], references: [id_produk])
   transaksi TransaksiPembayaran[]
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@index([id_user])
-  @@index([id_produk])
-  @@index([status_pesanan])
-  @@index([dp_status])
-  @@index([pelunasan_status])
-  @@index([tanggal_pesan])
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  userId_user     Int
+  produkId_produk Int
 }
 
 model TransaksiPembayaran {

@@ -2,10 +2,16 @@ import prisma from "../prisma/client.js";
 
 class PesananRepository {
 
+    // ===============================
+    // CREATE
+    // ===============================
     async create(data) {
         return prisma.pesanan.create({ data });
     }
 
+    // ===============================
+    // DETAIL PESANAN
+    // ===============================
     async findById(id_pesanan) {
         return prisma.pesanan.findUnique({
             where: { id_pesanan },
@@ -28,54 +34,63 @@ class PesananRepository {
         });
     }
 
+    // ===============================
+    // PESANAN USER
+    // ===============================
     async findByUser(id_user) {
         return prisma.pesanan.findMany({
             where: { id_user },
             orderBy: { tanggal_pesan: "desc" },
-            include: { produk: true },
-        });
-    }
-
-    async updateStatus(id_pesanan, data) {
-        return prisma.pesanan.update({
-            where: { id_pesanan },
-            data,
+            include: {
+                produk: true
+            }
         });
     }
 
     // ===============================
-    // DASHBOARD CUSTOMER SUMMARY
+    // UPDATE STATUS
+    // ===============================
+    async updateStatus(id_pesanan, data) {
+        return prisma.pesanan.update({
+            where: { id_pesanan },
+            data
+        });
+    }
+
+    // ===============================
+    // DASHBOARD CUSTOMER
     // ===============================
     async getSummaryByUser(id_user) {
         return prisma.pesanan.groupBy({
             by: ["status_pesanan"],
             where: { id_user },
-            _count: { _all: true },
+            _count: { _all: true }
         });
     }
 
     // ===============================
-    // DASHBOARD ADMIN SUMMARY
+    // DASHBOARD ADMIN
     // ===============================
     async getSummaryAll() {
         return prisma.pesanan.groupBy({
             by: ["status_pesanan"],
-            _count: { _all: true },
+            _count: { _all: true }
         });
     }
 
     // ===============================
-    // TOTAL PESANAN (OPTIONAL)
+    // TOTAL PESANAN
     // ===============================
     async countByUser(id_user) {
         return prisma.pesanan.count({
-            where: { id_user },
+            where: { id_user }
         });
     }
 
     async countAll() {
         return prisma.pesanan.count();
     }
+
     // ===============================
     // TOTAL PENDAPATAN (ADMIN)
     // ===============================
@@ -89,10 +104,8 @@ class PesananRepository {
             }
         });
 
-        return result._sum.jumlah || 0;
+        return result._sum.jumlah ?? 0;
     }
-
 }
-
 
 export default new PesananRepository();

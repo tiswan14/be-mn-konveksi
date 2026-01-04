@@ -5,13 +5,22 @@ class PesananService {
     // ===============================
     // CREATE PESANAN
     // ===============================
-    async createPesanan({ id_user, id_produk, qty, harga_satuan }) {
+    async createPesanan({ id_user, id_produk, qty, catatan }) {
 
+        // ambil produk resmi dari DB
         const produk = await pesananRepo.findProdukById(id_produk);
-        if (!produk) throw new Error("Produk tidak ditemukan");
+        if (!produk) {
+            throw new Error("Produk tidak ditemukan");
+        }
 
-        const total_harga = qty * harga_satuan;
-        const dp_wajib = Math.floor(total_harga * 0.5);
+        if (qty < 1) {
+            throw new Error("Jumlah minimal 1");
+        }
+
+        // 🔒 harga dari DB, BUKAN dari FE
+        const harga_satuan = produk.harga;
+        const total_harga = harga_satuan * qty;
+        const dp_wajib = Math.ceil(total_harga * 0.5);
 
         return pesananRepo.create({
             id_user,
@@ -20,8 +29,11 @@ class PesananService {
             harga_satuan,
             total_harga,
             dp_wajib,
+            catatan: catatan || null,
+            status_pesanan: "MENUNGGU_DP"
         });
     }
+
 
 
     // ===============================
@@ -105,6 +117,13 @@ class PesananService {
 
         return summary;
     }
+
+    async findProdukById(id_produk) {
+        return prisma.produk.findUnique({
+            where: { id_produk }
+        });
+    }
+
 
 }
 
