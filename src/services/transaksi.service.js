@@ -26,7 +26,6 @@ class TransaksiService {
 
         if (!pesanan) throw new Error("Pesanan tidak ditemukan.");
 
-        // 🔒 VALIDASI STATUS PESANAN
         if (jenis_pembayaran === "DP" && pesanan.status_pesanan !== "MENUNGGU_DP") {
             throw new Error("Pesanan tidak dalam status menunggu DP");
         }
@@ -38,7 +37,6 @@ class TransaksiService {
             throw new Error("Pesanan belum bisa dilakukan pelunasan");
         }
 
-
         const jumlah =
             jenis_pembayaran === "DP"
                 ? pesanan.dp_wajib
@@ -46,37 +44,34 @@ class TransaksiService {
 
         const order_id = this.generateOrderId(id_pesanan, jenis_pembayaran);
 
-        // Midtrans Payload
         const parameter = {
             transaction_details: {
                 order_id,
                 gross_amount: jumlah,
             },
             customer_details: {
-                first_name: pesanan.id_user,
+                first_name: `User-${pesanan.id_user}`,
             },
         };
 
-        const snap = await this.midtrans.createTransaction(parameter);
+        // ✅ SNAP TOKEN (BUKAN REDIRECT)
+        const snapToken = await this.midtrans.createTransactionToken(parameter);
 
-        // SIMPAN TRANSAKSI
         await transaksiRepo.create({
             id_pesanan,
             jenis_pembayaran,
             jumlah,
             midtrans_order_id: order_id,
-            midtrans_redirect_url: snap.redirect_url,
             midtrans_payment_type: "snap",
             midtrans_status: "pending",
         });
 
         return {
             order_id,
-            token: snap.token,
-            redirect_url: snap.redirect_url
+            snap_token: snapToken,
         };
-
     }
+
 
     // =======================
     // HANDLE WEBHOOK MIDTRANS
