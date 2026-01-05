@@ -12,6 +12,58 @@ class PesananRepository {
     }
 
     // ===============================
+    // GET ALL PESANAN (ADMIN)
+    // ===============================
+    async findAll() {
+        return prisma.pesanan.findMany({
+            orderBy: { tanggal_pesan: "desc" },
+            select: {
+                id_pesanan: true,
+                qty: true,
+                harga_satuan: true,
+                total_harga: true,
+                dp_wajib: true,
+                catatan: true,
+                status_pesanan: true,
+                dp_status: true,
+                pelunasan_status: true,
+                tanggal_pesan: true,
+
+                user: {
+                    select: {
+                        id_user: true,
+                        nama: true,
+                        email: true,
+                        no_hp: true
+                    }
+                },
+
+                produk: {
+                    select: {
+                        id_produk: true,
+                        nama_produk: true,
+                        harga: true,
+                        estimasi_pengerjaan: true,
+                        bahan: true,
+                        foto: true
+                    }
+                },
+
+                transaksi: {
+                    select: {
+                        id_transaksi: true,
+                        jenis_pembayaran: true,
+                        jumlah: true,
+                        midtrans_status: true,
+                        created_at: true
+                    }
+                }
+            }
+        });
+    }
+
+
+    // ===============================
     // CREATE
     // ===============================
     async create(data) {

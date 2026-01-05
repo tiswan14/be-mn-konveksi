@@ -4,6 +4,7 @@ import {
     getPesananUser,
     deletePesanan,
     getDetailPesanan,
+    getAllPesanan,
     updateStatusPesanan,
     getPesananSummaryUser,
     getPesananSummaryAdmin,
@@ -32,6 +33,9 @@ router.get("/:id", auth(), getDetailPesanan);
 // ADMIN ONLY
 // ===============================
 router.patch("/:id/status", auth(), requireAdmin, updateStatusPesanan);
+
+router.get("/", auth(), requireAdmin, getAllPesanan);
+
 
 // 🔹 DASHBOARD ADMIN (SUMMARY)
 router.get("/admin/summary", auth(), requireAdmin, getPesananSummaryAdmin);

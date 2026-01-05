@@ -3,6 +3,18 @@ import pesananRepo from "../repositories/pesanan.repository.js";
 class PesananService {
 
     // ===============================
+    // GET ALL PESANAN (ADMIN)
+    // ===============================
+    async getAllPesanan(role) {
+        if (role !== "ADMIN") {
+            throw new Error("Akses ditolak");
+        }
+
+        return pesananRepo.findAll();
+    }
+
+
+    // ===============================
     // CREATE PESANAN
     // ===============================
     async createPesanan({ id_user, id_produk, qty, catatan }) {

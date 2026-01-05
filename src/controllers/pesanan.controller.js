@@ -31,6 +31,35 @@ export const createPesanan = async (req, res) => {
     }
 };
 
+// ===============================
+// GET ALL PESANAN (ADMIN)
+// ===============================
+export const getAllPesanan = async (req, res) => {
+    try {
+        const { role } = req.user;
+
+        if (role !== "ADMIN") {
+            return res.status(403).json({
+                success: false,
+                message: "Akses ditolak",
+            });
+        }
+
+        const data = await pesananService.getAllPesanan(role);
+
+        return res.json({
+            success: true,
+            data,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+
 
 export const getPesananUser = async (req, res) => {
     try {
