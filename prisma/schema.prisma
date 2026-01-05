@@ -32,6 +32,7 @@ enum StatusPesanan {
 enum JenisPembayaran {
   DP
   PELUNASAN
+  FULL
 }
 
 // ==============================

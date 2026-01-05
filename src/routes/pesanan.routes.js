@@ -2,6 +2,7 @@ import express from "express";
 import {
     createPesanan,
     getPesananUser,
+    deletePesanan,
     getDetailPesanan,
     updateStatusPesanan,
     getPesananSummaryUser,
@@ -34,5 +35,8 @@ router.patch("/:id/status", auth(), requireAdmin, updateStatusPesanan);
 
 // 🔹 DASHBOARD ADMIN (SUMMARY)
 router.get("/admin/summary", auth(), requireAdmin, getPesananSummaryAdmin);
+
+router.delete("/:id", auth(), deletePesanan);
+
 
 export default router;

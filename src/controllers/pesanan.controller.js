@@ -100,3 +100,30 @@ export const getPesananSummaryAdmin = async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 };
+
+// ===============================
+// DELETE PESANAN
+// ===============================
+export const deletePesanan = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { id: id_user, role } = req.user;
+
+        const result = await pesananService.deletePesanan({
+            id_pesanan: Number(id),
+            id_user,
+            role,
+        });
+
+        return res.json({
+            success: true,
+            message: result.message,
+        });
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
