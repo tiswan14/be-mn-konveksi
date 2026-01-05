@@ -6,7 +6,6 @@ class PesananService {
     // CREATE PESANAN
     // ===============================
     async createPesanan({ id_user, id_produk, qty, catatan }) {
-
         const produk = await pesananRepo.findProdukById(id_produk);
         if (!produk) throw new Error("Produk tidak ditemukan");
 
@@ -24,9 +23,10 @@ class PesananService {
             total_harga,
             dp_wajib,
             catatan: catatan || null,
-            status_pesanan: "MENUNGGU_DP"
+            status_pesanan: "DIBUAT"
         });
     }
+
 
     // ===============================
     // PESANAN USER

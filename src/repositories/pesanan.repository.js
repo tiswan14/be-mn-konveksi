@@ -24,24 +24,51 @@ class PesananRepository {
     async findById(id_pesanan) {
         return prisma.pesanan.findUnique({
             where: { id_pesanan },
-            include: {
+            select: {
+                id_pesanan: true,
+                qty: true,
+                harga_satuan: true,
+                total_harga: true,
+                dp_wajib: true,
+                catatan: true,
+                status_pesanan: true,
+                dp_status: true,
+                pelunasan_status: true,
+                tanggal_pesan: true,
+
                 user: {
                     select: {
                         id_user: true,
                         nama: true,
                         email: true,
-                        no_hp: true,
-                        alamat: true,
-                        role: true,
-                        created_at: true,
-                        updated_at: true
+                        no_hp: true
                     }
                 },
-                produk: true,
-                transaksi: true
+
+                produk: {
+                    select: {
+                        id_produk: true,
+                        nama_produk: true,
+                        harga: true,
+                        estimasi_pengerjaan: true,
+                        bahan: true,
+                        foto: true
+                    }
+                },
+
+                transaksi: {
+                    select: {
+                        id_transaksi: true,
+                        jenis_pembayaran: true,
+                        jumlah: true,
+                        midtrans_status: true,
+                        created_at: true
+                    }
+                }
             }
         });
     }
+
 
     // ===============================
     // PESANAN USER

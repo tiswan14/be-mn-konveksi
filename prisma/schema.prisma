@@ -23,11 +23,12 @@ enum StatusPembayaran {
 }
 
 enum StatusPesanan {
+  DIBUAT
   MENUNGGU_DP
-  MENUNGGU_VERIFIKASI
-  MENUNGGU_PELUNASAN
   DIPROSES
+  MENUNGGU_PELUNASAN
   SELESAI
+  DIBATALKAN
 }
 
 enum JenisPembayaran {
