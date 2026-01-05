@@ -7,6 +7,7 @@ export const createTransaksiValidator = [
 
     body("jenis_pembayaran")
         .notEmpty().withMessage("Jenis pembayaran wajib diisi")
-        .isIn(["DP", "PELUNASAN"])
-        .withMessage("Jenis pembayaran harus DP atau PELUNASAN"),
+        .isIn(["DP", "PELUNASAN", "FULL"])
+        .withMessage("Jenis pembayaran harus DP, PELUNASAN, atau FULL"),
+
 ];

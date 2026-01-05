@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "StatusPesanan" ADD VALUE 'MENUNGGU_VERIFIKASI';

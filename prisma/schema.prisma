@@ -24,8 +24,9 @@ enum StatusPembayaran {
 
 enum StatusPesanan {
   MENUNGGU_DP
-  DIPROSES
+  MENUNGGU_VERIFIKASI
   MENUNGGU_PELUNASAN
+  DIPROSES
   SELESAI
 }
 

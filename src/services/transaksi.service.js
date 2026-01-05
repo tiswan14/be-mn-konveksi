@@ -11,37 +11,56 @@ class TransaksiService {
         });
     }
 
-    // Generate Order ID
+    // =======================
+    // GENERATE ORDER ID
+    // =======================
     generateOrderId(id_pesanan, jenis) {
         return `PESANAN-${id_pesanan}-${jenis}-${Date.now()}`;
     }
 
     // =======================
-    // CREATE PAYMENT (DP / PELUNASAN)
+    // CREATE PAYMENT (DP / PELUNASAN / FULL)
     // =======================
     async createPayment(id_pesanan, jenis_pembayaran) {
         const pesanan = await prisma.pesanan.findUnique({
             where: { id_pesanan },
         });
 
-        if (!pesanan) throw new Error("Pesanan tidak ditemukan.");
+        if (!pesanan) throw new Error("Pesanan tidak ditemukan");
 
-        if (jenis_pembayaran === "DP" && pesanan.status_pesanan !== "MENUNGGU_DP") {
-            throw new Error("Pesanan tidak dalam status menunggu DP");
+        let jumlah = 0;
+
+        // =======================
+        // VALIDASI & HITUNG JUMLAH
+        // =======================
+        if (jenis_pembayaran === "DP") {
+            if (pesanan.status_pesanan !== "MENUNGGU_DP") {
+                throw new Error("Pesanan tidak dalam status menunggu DP");
+            }
+            jumlah = pesanan.dp_wajib;
         }
 
-        if (
-            jenis_pembayaran === "PELUNASAN" &&
-            pesanan.status_pesanan !== "MENUNGGU_PELUNASAN"
-        ) {
-            throw new Error("Pesanan belum bisa dilakukan pelunasan");
+        else if (jenis_pembayaran === "PELUNASAN") {
+            if (pesanan.status_pesanan !== "MENUNGGU_PELUNASAN") {
+                throw new Error("Pesanan belum bisa dilakukan pelunasan");
+            }
+            jumlah = pesanan.total_harga - pesanan.dp_wajib;
         }
 
-        const jumlah =
-            jenis_pembayaran === "DP"
-                ? pesanan.dp_wajib
-                : pesanan.total_harga - pesanan.dp_wajib;
+        else if (jenis_pembayaran === "FULL") {
+            if (pesanan.status_pesanan !== "MENUNGGU_DP") {
+                throw new Error("Pesanan tidak bisa dibayar full");
+            }
+            jumlah = pesanan.total_harga;
+        }
 
+        else {
+            throw new Error("Jenis pembayaran tidak valid");
+        }
+
+        // =======================
+        // MIDTRANS
+        // =======================
         const order_id = this.generateOrderId(id_pesanan, jenis_pembayaran);
 
         const parameter = {
@@ -54,9 +73,11 @@ class TransaksiService {
             },
         };
 
-        // ✅ SNAP TOKEN (BUKAN REDIRECT)
         const snapToken = await this.midtrans.createTransactionToken(parameter);
 
+        // =======================
+        // SIMPAN TRANSAKSI
+        // =======================
         await transaksiRepo.create({
             id_pesanan,
             jenis_pembayaran,
@@ -64,6 +85,16 @@ class TransaksiService {
             midtrans_order_id: order_id,
             midtrans_payment_type: "snap",
             midtrans_status: "pending",
+        });
+
+        // =======================
+        // UPDATE STATUS PESANAN
+        // =======================
+        await prisma.pesanan.update({
+            where: { id_pesanan },
+            data: {
+                status_pesanan: "MENUNGGU_VERIFIKASI",
+            },
         });
 
         return {
@@ -92,20 +123,39 @@ class TransaksiService {
                 status === "settlement" ? new Date() : null,
         });
 
+        // =======================
         // UPDATE PESANAN
+        // =======================
         if (status === "settlement") {
+
+            // DP
             if (transaksi.jenis_pembayaran === "DP") {
                 await prisma.pesanan.update({
                     where: { id_pesanan: transaksi.id_pesanan },
                     data: {
                         dp_status: "VALID",
-                        status_pesanan: "DIPROSES",
+                        status_pesanan: "MENUNGGU_PELUNASAN",
                     },
                 });
-            } else if (transaksi.jenis_pembayaran === "PELUNASAN") {
+            }
+
+            // PELUNASAN
+            else if (transaksi.jenis_pembayaran === "PELUNASAN") {
                 await prisma.pesanan.update({
                     where: { id_pesanan: transaksi.id_pesanan },
                     data: {
+                        pelunasan_status: "VALID",
+                        status_pesanan: "SELESAI",
+                    },
+                });
+            }
+
+            // FULL
+            else if (transaksi.jenis_pembayaran === "FULL") {
+                await prisma.pesanan.update({
+                    where: { id_pesanan: transaksi.id_pesanan },
+                    data: {
+                        dp_status: "VALID",
                         pelunasan_status: "VALID",
                         status_pesanan: "SELESAI",
                     },

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Test Midtrans Snap</title>
+
+    <!-- MIDTRANS SNAP SCRIPT (SANDBOX) -->
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="CLIENT_KEY_KAMU">
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 12px;
+            width: 360px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            margin-bottom: 12px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            margin-bottom: 16px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h2>Test Midtrans Snap</h2>
+
+        <label>Snap Token</label>
+        <input type="text" id="snapToken" placeholder="Masukkan snap token dari backend" />
+
+        <button onclick="bayar()">Bayar Sekarang</button>
+    </div>
+
+    <script>
+        function bayar() {
+            const snapToken = document.getElementById("snapToken").value.trim();
+
+            if (!snapToken) {
+                alert("Snap token wajib diisi!");
+                return;
+            }
+
+            window.snap.pay(snapToken, {
+                onSuccess: function (result) {
+                    console.log("SUCCESS:", result);
+                    alert("Pembayaran berhasil");
+                },
+                onPending: function (result) {
+                    console.log("PENDING:", result);
+                    alert("Menunggu pembayaran");
+                },
+                onError: function (result) {
+                    console.error("ERROR:", result);
+                    alert("Pembayaran gagal");
+                },
+                onClose: function () {
+                    alert("Popup ditutup tanpa menyelesaikan pembayaran");
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>
