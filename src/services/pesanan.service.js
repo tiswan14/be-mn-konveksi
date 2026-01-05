@@ -51,19 +51,16 @@ class PesananService {
     // ===============================
     // DELETE PESANAN
     // ===============================
+
     async deletePesanan({ id_pesanan, id_user, role }) {
 
         const pesanan = await pesananRepo.findByIdWithTransaksi(id_pesanan);
-        if (!pesanan) {
-            throw new Error("Pesanan tidak ditemukan");
-        }
+        if (!pesanan) throw new Error("Pesanan tidak ditemukan");
 
-        // CUSTOMER hanya boleh hapus pesanan sendiri
         if (role === "CUSTOMER" && pesanan.id_user !== id_user) {
             throw new Error("Tidak diizinkan menghapus pesanan ini");
         }
 
-        // Tidak boleh hapus jika sudah diproses atau selesai
         if (
             pesanan.status_pesanan === "DIPROSES" ||
             pesanan.status_pesanan === "SELESAI"
@@ -71,21 +68,22 @@ class PesananService {
             throw new Error("Pesanan tidak dapat dihapus");
         }
 
-        // Tidak boleh hapus jika sudah ada pembayaran sukses
         const sudahDibayar = pesanan.transaksi.some(
             (t) => t.midtrans_status === "settlement"
         );
-
         if (sudahDibayar) {
             throw new Error("Pesanan dengan pembayaran berhasil tidak dapat dihapus");
         }
 
+        // 🔥 HAPUS TRANSAKSI DULU
+        await pesananRepo.deleteTransaksiByPesanan(id_pesanan);
+
+        // 🔥 BARU HAPUS PESANAN
         await pesananRepo.deleteById(id_pesanan);
 
-        return {
-            message: "Pesanan berhasil dihapus",
-        };
+        return { message: "Pesanan berhasil dihapus" };
     }
+
 
     // ===============================
     // DASHBOARD CUSTOMER SUMMARY

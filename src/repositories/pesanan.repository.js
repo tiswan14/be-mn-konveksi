@@ -115,6 +115,38 @@ class PesananRepository {
 
         return result._sum.jumlah ?? 0;
     }
+    // ===============================
+    // DETAIL PESANAN + TRANSAKSI (UNTUK DELETE)
+    // ===============================
+    async findByIdWithTransaksi(id_pesanan) {
+        return prisma.pesanan.findUnique({
+            where: { id_pesanan },
+            include: {
+                transaksi: true
+            }
+        });
+    }
+
+    // ===============================
+    // DELETE PESANAN
+    // ===============================
+    async deleteById(id_pesanan) {
+        return prisma.pesanan.delete({
+            where: { id_pesanan }
+        });
+    }
+
+    // ===============================
+    // DELETE TRANSAKSI PESANAN
+    // ===============================
+    async deleteTransaksiByPesanan(id_pesanan) {
+        return prisma.transaksiPembayaran.deleteMany({
+            where: { id_pesanan }
+        });
+    }
+
 }
+
+
 
 export default new PesananRepository();
