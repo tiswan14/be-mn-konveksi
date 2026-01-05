@@ -71,17 +71,57 @@ class PesananRepository {
 
 
     // ===============================
-    // PESANAN USER
+    // PESANAN USER (SINKRON DENGAN findById)
     // ===============================
     async findByUser(id_user) {
         return prisma.pesanan.findMany({
             where: { id_user },
             orderBy: { tanggal_pesan: "desc" },
-            include: {
-                produk: true
+            select: {
+                id_pesanan: true,
+                qty: true,
+                harga_satuan: true,
+                total_harga: true,
+                dp_wajib: true,
+                catatan: true,
+                status_pesanan: true,
+                dp_status: true,
+                pelunasan_status: true,
+                tanggal_pesan: true,
+
+                user: {
+                    select: {
+                        id_user: true,
+                        nama: true,
+                        email: true,
+                        no_hp: true
+                    }
+                },
+
+                produk: {
+                    select: {
+                        id_produk: true,
+                        nama_produk: true,
+                        harga: true,
+                        estimasi_pengerjaan: true,
+                        bahan: true,
+                        foto: true
+                    }
+                },
+
+                transaksi: {
+                    select: {
+                        id_transaksi: true,
+                        jenis_pembayaran: true,
+                        jumlah: true,
+                        midtrans_status: true,
+                        created_at: true
+                    }
+                }
             }
         });
     }
+
 
     // ===============================
     // UPDATE STATUS
