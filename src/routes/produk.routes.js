@@ -34,7 +34,7 @@ router.post(
     requireAdmin,
     upload.single("foto"),
     validateImageUpload,
-    produkValidator,
+    produkValidatorCreate,
     validate,
     produkController.create
 );
@@ -46,7 +46,7 @@ router.put(
     upload.single("foto"),
     validateImageUpload,
     produkIdParam,
-    produkValidator,
+    produkValidatorUpdate, // 🔥 INI KUNCINYA
     validate,
     produkController.update
 );
