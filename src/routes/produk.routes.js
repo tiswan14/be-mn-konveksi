@@ -7,7 +7,8 @@ import { requireAdmin } from "../middlewares/role.middleware.js";
 import { validate } from "../middlewares/validate.js";
 
 import {
-    produkValidator,
+    produkValidatorCreate,
+    produkValidatorUpdate,
     produkIdParam,
 } from "../validators/produk.validator.js";
 
@@ -46,7 +47,7 @@ router.put(
     upload.single("foto"),
     validateImageUpload,
     produkIdParam,
-    produkValidatorUpdate, // 🔥 INI KUNCINYA
+    produkValidatorUpdate,
     validate,
     produkController.update
 );

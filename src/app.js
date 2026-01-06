@@ -51,8 +51,7 @@ const corsOptions = {
     allowedHeaders: ["Content-Type", "Authorization"],
 };
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // 🔥 WAJIB UNTUK PREFLIGHT
+app.use(cors(corsOptions)); // ✅ CUKUP INI
 
 // ======================================================
 // BODY PARSER & LOGGER
@@ -94,7 +93,7 @@ app.use("/api/transaksi", transaksiRoutes);
 app.use("/api/laporan", laporanRoutes);
 
 // ======================================================
-// GLOBAL ERROR HANDLER (OPTIONAL BUT CLEAN)
+// GLOBAL ERROR HANDLER
 // ======================================================
 app.use((err, req, res, next) => {
     console.error(err);
