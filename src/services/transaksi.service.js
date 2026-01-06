@@ -139,7 +139,7 @@ class TransaksiService {
         });
 
         // =======================
-        // UPDATE PESANAN
+        // UPDATE PESANAN (FINAL & BENAR)
         // =======================
         if (status === "settlement") {
 
@@ -149,7 +149,7 @@ class TransaksiService {
                     where: { id_pesanan: transaksi.id_pesanan },
                     data: {
                         dp_status: "VALID",
-                        status_pesanan: "MENUNGGU_PELUNASAN",
+                        status_pesanan: "DIPROSES", // ⬅️ FIX
                     },
                 });
             }
@@ -160,7 +160,7 @@ class TransaksiService {
                     where: { id_pesanan: transaksi.id_pesanan },
                     data: {
                         pelunasan_status: "VALID",
-                        status_pesanan: "SELESAI",
+                        // status TIDAK DIUBAH
                     },
                 });
             }
@@ -172,11 +172,12 @@ class TransaksiService {
                     data: {
                         dp_status: "VALID",
                         pelunasan_status: "VALID",
-                        status_pesanan: "SELESAI",
+                        status_pesanan: "DIPROSES", // ⬅️ FIX
                     },
                 });
             }
         }
+
 
         return transaksi;
     }
