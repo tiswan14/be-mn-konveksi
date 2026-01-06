@@ -71,12 +71,23 @@ export const produkRepository = {
     // ==============================
     // UPDATE
     // ==============================
-    update: (id, data) =>
-        prisma.produk.update({
-            where: { id_produk: Number(id) },
+    update: (id, data) => {
+        const id_produk = Number(id);
+        if (isNaN(id_produk)) {
+            throw new Error("ID produk tidak valid");
+        }
+
+        if (!data || Object.keys(data).length === 0) {
+            throw new Error("Data update kosong");
+        }
+
+        return prisma.produk.update({
+            where: { id_produk },
             data,
-        }),
-        
+        });
+    },
+
+
     // ==============================
     // FIND BY NAMA (UNTUK VALIDATOR UNIQUE)
     // ==============================

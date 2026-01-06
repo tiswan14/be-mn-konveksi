@@ -62,9 +62,13 @@ export const produkService = {
     // UPDATE PRODUK + HAPUS FOTO LAMA
     // ======================================================
     updateProduk: async (id, data, file) => {
-        // ambil produk lama
-        const existingProduk = await produkRepository.findById(id);
+        const id_produk = Number(id);
+        if (isNaN(id_produk)) {
+            throw new Error("ID produk tidak valid");
+        }
 
+        // ambil produk lama
+        const existingProduk = await produkRepository.findById(id_produk);
         if (!existingProduk) {
             const err = new Error("Produk tidak ditemukan");
             err.code = "P2025";
@@ -73,7 +77,7 @@ export const produkService = {
 
         let fotoUrl = existingProduk.foto;
 
-        // jika upload foto baru
+        // upload foto baru (opsional)
         if (file) {
             const upload = await put(
                 `produk/${Date.now()}-${file.originalname}`,
@@ -83,7 +87,6 @@ export const produkService = {
 
             fotoUrl = upload.url;
 
-            // hapus foto lama
             if (existingProduk.foto) {
                 try {
                     await del(existingProduk.foto);
@@ -93,15 +96,24 @@ export const produkService = {
             }
         }
 
-        return produkRepository.update(id, {
-            nama_produk: data.nama_produk,
-            deskripsi: data.deskripsi,
-            harga: Number(data.harga),
-            estimasi_pengerjaan: Number(data.estimasi_pengerjaan),
-            bahan: data.bahan,
-            foto: fotoUrl,
-        });
+        // 🔥 FILTER DATA (ANTI undefined & NaN)
+        const payload = {};
+
+        if (data.nama_produk !== undefined) payload.nama_produk = data.nama_produk;
+        if (data.deskripsi !== undefined) payload.deskripsi = data.deskripsi;
+        if (data.harga !== undefined) payload.harga = Number(data.harga);
+        if (data.estimasi_pengerjaan !== undefined)
+            payload.estimasi_pengerjaan = Number(data.estimasi_pengerjaan);
+        if (data.bahan !== undefined) payload.bahan = data.bahan;
+        if (fotoUrl !== undefined) payload.foto = fotoUrl;
+
+        if (Object.keys(payload).length === 0) {
+            throw new Error("Tidak ada data yang diupdate");
+        }
+
+        return produkRepository.update(id_produk, payload);
     },
+
 
     // ======================================================
     // DELETE PRODUK + HAPUS FOTO

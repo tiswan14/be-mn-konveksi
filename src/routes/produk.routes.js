@@ -40,7 +40,7 @@ router.post(
     produkController.create
 );
 
-router.put(
+router.patch(
     "/:id",
     auth(),
     requireAdmin,
@@ -51,6 +51,7 @@ router.put(
     validate,
     produkController.update
 );
+
 
 router.delete(
     "/:id",
