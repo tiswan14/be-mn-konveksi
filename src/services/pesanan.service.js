@@ -35,9 +35,10 @@ class PesananService {
             total_harga,
             dp_wajib,
             catatan: catatan || null,
-            status_pesanan: "DIBUAT"
+            status_pesanan: "MENUNGGU_DP"
         });
     }
+
 
 
     // ===============================
