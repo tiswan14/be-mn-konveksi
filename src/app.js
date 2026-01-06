@@ -16,96 +16,76 @@ import laporanRoutes from "./routes/admin.laporan.route.js";
 
 const app = express();
 
-// ===========================
-// TRUST PROXY (WAJIB UNTUK VERCEL)
-// ===========================
+// ======================================================
+// TRUST PROXY (WAJIB UNTUK VERCEL / SERVERLESS)
+// ======================================================
 app.set("trust proxy", 1);
 
-// ===========================
-// SECURITY
-// ===========================
+// ======================================================
+// SECURITY HEADERS
+// ======================================================
 app.use(helmet());
 
-// ===========================
+// ======================================================
 // RATE LIMIT
-// ===========================
+// ======================================================
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 200,
     standardHeaders: true,
     legacyHeaders: false,
-    message: "Terlalu banyak request dari IP ini, coba lagi nanti.",
 });
 app.use(limiter);
 
-// ===========================
-// CORS
-// ===========================
-const whitelist = [
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "http://localhost:5000",
-    "https://mn-konveksi.vercel.app",
-    "https://be-mn-konveksi.vercel.app",
-];
+// ======================================================
+// CORS (FIX PREFLIGHT + COOKIE AUTH)
+// ======================================================
+const corsOptions = {
+    origin: [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://mn-konveksi.vercel.app",
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+};
 
-app.use((req, res, next) => {
-    if (req.path === "/openapi.json") {
-        // Docs harus public
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-        res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // 🔥 WAJIB UNTUK PREFLIGHT
 
-        if (req.method === "OPTIONS") {
-            return res.sendStatus(204);
-        }
-        return next();
-    }
-
-    // API pakai whitelist
-    cors({
-        origin(origin, callback) {
-            if (!origin || whitelist.includes(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error("Not allowed by CORS"));
-            }
-        },
-        credentials: true,
-    })(req, res, next);
-});
-// ===========================
-// BODY PARSER + LOGGER
-// ===========================
+// ======================================================
+// BODY PARSER & LOGGER
+// ======================================================
 app.use(express.json());
 app.use(morgan("dev"));
 
-// ===========================
-// HOME
-// ===========================
+// ======================================================
+// STATIC FILE (OPTIONAL)
+// ======================================================
+app.use(express.static("public"));
+
+// ======================================================
+// ROOT
+// ======================================================
 app.get("/", (req, res) => {
     res.json({
+        success: true,
         message: "✨ Welcome to MN Konveksi API",
-        status: "success",
-        author: "MN Konveksi Backend",
-        description: "API backend untuk manajemen produk, pesanan, & pembayaran.",
+        service: "Backend API",
     });
 });
 
-app.use(express.static('public'));
-
-
-// ===========================
-// OPENAPI JSON (UNTUK SWAGGER UI CDN)
-// ===========================
-app.get("/openapi.json", (req, res) => {
+// ======================================================
+// OPENAPI JSON (PUBLIC, NO AUTH)
+// ======================================================
+app.get("/openapi.json", cors({ origin: "*" }), (req, res) => {
     res.json(swaggerSpec);
 });
 
-
-// ===========================
+// ======================================================
 // ROUTES
-// ===========================
+// ======================================================
 app.use("/api/auth", authRoutes);
 app.use("/api", userRoutes);
 app.use("/api/produk", produkRoutes);
@@ -113,5 +93,23 @@ app.use("/api/pesanan", pesananRoutes);
 app.use("/api/transaksi", transaksiRoutes);
 app.use("/api/laporan", laporanRoutes);
 
+// ======================================================
+// GLOBAL ERROR HANDLER (OPTIONAL BUT CLEAN)
+// ======================================================
+app.use((err, req, res, next) => {
+    console.error(err);
+
+    if (err.message === "Not allowed by CORS") {
+        return res.status(403).json({
+            success: false,
+            message: "CORS tidak diizinkan",
+        });
+    }
+
+    res.status(500).json({
+        success: false,
+        message: "Terjadi kesalahan pada server",
+    });
+});
 
 export default app;
