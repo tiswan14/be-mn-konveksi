@@ -1,0 +1,239 @@
+{
+    "info": {
+        "_postman_id": "a3c5d1f0-9f7a-4c9a-bc8d-1b8a4a6c0001",
+        "name": "MN Konveksi - Laporan API",
+        "description": "Kumpulan endpoint laporan pendapatan dan pesanan (Admin Only)",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Pendapatan",
+            "item": [
+                {
+                    "name": "Pendapatan Harian",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token_admin}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/laporan/pendapatan/harian?tanggal=2026-01-05",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "laporan",
+                                "pendapatan",
+                                "harian"
+                            ],
+                            "query": [
+                                {
+                                    "key": "tanggal",
+                                    "value": "2026-01-05"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Pendapatan Bulanan",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token_admin}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/laporan/pendapatan/bulanan?bulan=1&tahun=2026",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "laporan",
+                                "pendapatan",
+                                "bulanan"
+                            ],
+                            "query": [
+                                {
+                                    "key": "bulan",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "tahun",
+                                    "value": "2026"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Pendapatan Tahunan",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token_admin}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/laporan/pendapatan/tahunan?tahun=2026",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "laporan",
+                                "pendapatan",
+                                "tahunan"
+                            ],
+                            "query": [
+                                {
+                                    "key": "tahun",
+                                    "value": "2026"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Pesanan",
+            "item": [
+                {
+                    "name": "Pesanan Berdasarkan Status",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token_admin}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/laporan/pesanan/status",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "laporan",
+                                "pesanan",
+                                "status"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Pesanan Harian",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token_admin}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/laporan/pesanan/harian?tanggal=2026-01-05",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "laporan",
+                                "pesanan",
+                                "harian"
+                            ],
+                            "query": [
+                                {
+                                    "key": "tanggal",
+                                    "value": "2026-01-05"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Pesanan Bulanan",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token_admin}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/laporan/pesanan/bulanan?bulan=1&tahun=2026",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "laporan",
+                                "pesanan",
+                                "bulanan"
+                            ],
+                            "query": [
+                                {
+                                    "key": "bulan",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "tahun",
+                                    "value": "2026"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Pesanan Tahunan",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token_admin}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/laporan/pesanan/tahunan?tahun=2026",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "laporan",
+                                "pesanan",
+                                "tahunan"
+                            ],
+                            "query": [
+                                {
+                                    "key": "tahun",
+                                    "value": "2026"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

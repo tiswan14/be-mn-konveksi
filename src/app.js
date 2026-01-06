@@ -12,6 +12,7 @@ import userRoutes from "./routes/user.routes.js";
 import produkRoutes from "./routes/produk.routes.js";
 import pesananRoutes from "./routes/pesanan.routes.js";
 import transaksiRoutes from "./routes/transaksi.routes.js";
+import laporanRoutes from "./routes/admin.laporan.route.js";
 
 const app = express();
 
@@ -110,5 +111,7 @@ app.use("/api", userRoutes);
 app.use("/api/produk", produkRoutes);
 app.use("/api/pesanan", pesananRoutes);
 app.use("/api/transaksi", transaksiRoutes);
+app.use("/api/laporan", laporanRoutes);
+
 
 export default app;
