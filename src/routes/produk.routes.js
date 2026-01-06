@@ -40,7 +40,7 @@ router.post(
     produkController.create
 );
 
-router.patch(
+router.put(
     "/:id",
     auth(),
     requireAdmin,
