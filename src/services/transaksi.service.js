@@ -37,9 +37,18 @@ class TransaksiService {
             throw new Error("Pesanan tidak ditemukan");
         }
 
-        // 🔒 Cegah double payment
-        if (pesanan.transaksi.length > 0) {
-            throw new Error("Masih ada transaksi yang belum diselesaikan");
+        // =======================
+        // 🔁 PAKAI ULANG TRANSAKSI PENDING (JANGAN ERROR)
+        // =======================
+        const existing = pesanan.transaksi.find(
+            t => t.jenis_pembayaran === jenis_pembayaran
+        );
+
+        if (existing) {
+            return {
+                order_id: existing.midtrans_order_id,
+                snap_token: existing.snap_token
+            };
         }
 
         let jumlah;
@@ -48,7 +57,6 @@ class TransaksiService {
         // VALIDASI & HITUNG JUMLAH
         // =======================
         switch (jenis_pembayaran) {
-
             case "DP":
                 if (pesanan.status_pesanan !== "MENUNGGU_DP") {
                     throw new Error("Pesanan tidak dalam status menunggu DP");
@@ -56,21 +64,16 @@ class TransaksiService {
                 jumlah = pesanan.dp_wajib;
                 break;
 
-            case "PELUNASAN":
-                if (pesanan.status_pesanan !== "MENUNGGU_PELUNASAN") {
-                    throw new Error("Pesanan belum bisa dilakukan pelunasan");
-                }
-                jumlah = pesanan.total_harga - pesanan.dp_wajib;
-                break;
-
             case "FULL":
-                if (
-                    pesanan.status_pesanan !== "MENUNGGU_DP" ||
-                    pesanan.dp_status === "VALID"
-                ) {
+                if (pesanan.status_pesanan !== "MENUNGGU_DP") {
                     throw new Error("Pesanan tidak bisa dibayar full");
                 }
                 jumlah = pesanan.total_harga;
+                break;
+
+            case "PELUNASAN":
+                // pelunasan TIDAK tergantung status
+                jumlah = pesanan.total_harga - pesanan.dp_wajib;
                 break;
 
             default:
@@ -85,11 +88,11 @@ class TransaksiService {
         const parameter = {
             transaction_details: {
                 order_id,
-                gross_amount: jumlah,
+                gross_amount: jumlah
             },
             customer_details: {
-                first_name: `User-${pesanan.id_user}`,
-            },
+                first_name: `User-${pesanan.id_user}`
+            }
         };
 
         const snapToken = await this.midtrans.createTransactionToken(parameter);
@@ -102,15 +105,17 @@ class TransaksiService {
             jenis_pembayaran,
             jumlah,
             midtrans_order_id: order_id,
+            snap_token: snapToken,          // ⬅️ WAJIB
             midtrans_payment_type: "snap",
-            midtrans_status: "pending",
+            midtrans_status: "pending"
         });
 
         return {
             order_id,
-            snap_token: snapToken,
+            snap_token: snapToken
         };
     }
+
 
 
 

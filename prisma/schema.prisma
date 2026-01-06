@@ -118,12 +118,13 @@ model TransaksiPembayaran {
   // FIELD MIDTRANS ONLY
   // ============================
   midtrans_order_id        String    @unique
+  snap_token               String
   midtrans_transaction_id  String?
   midtrans_payment_type    String?
   midtrans_va_number       String?
-  midtrans_qr_url          String? // untuk QRIS
-  midtrans_redirect_url    String? // GoPay / card
-  midtrans_status          String? // pending, deny, expire, settlement, cancel
+  midtrans_qr_url          String?
+  midtrans_redirect_url    String?
+  midtrans_status          String?
   midtrans_settlement_time DateTime?
 
   pesanan Pesanan @relation(fields: [id_pesanan], references: [id_pesanan])
