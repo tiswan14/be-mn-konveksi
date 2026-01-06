@@ -17,7 +17,7 @@ import laporanRoutes from "./routes/admin.laporan.route.js";
 const app = express();
 
 // ======================================================
-// TRUST PROXY (WAJIB UNTUK VERCEL / SERVERLESS)
+// TRUST PROXY (WAJIB UNTUK VERCEL)
 // ======================================================
 app.set("trust proxy", 1);
 
@@ -38,7 +38,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // ======================================================
-// CORS (FIX PREFLIGHT + COOKIE AUTH)
+// CORS (SUDAH HANDLE PREFLIGHT OTOMATIS)
 // ======================================================
 const corsOptions = {
     origin: [
@@ -51,7 +51,7 @@ const corsOptions = {
     allowedHeaders: ["Content-Type", "Authorization"],
 };
 
-app.use(cors(corsOptions)); // ✅ CUKUP INI
+app.use(cors(corsOptions));
 
 // ======================================================
 // BODY PARSER & LOGGER
@@ -60,7 +60,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 // ======================================================
-// STATIC FILE (OPTIONAL)
+// STATIC FILE
 // ======================================================
 app.use(express.static("public"));
 
@@ -76,7 +76,7 @@ app.get("/", (req, res) => {
 });
 
 // ======================================================
-// OPENAPI JSON (PUBLIC, NO AUTH)
+// OPENAPI JSON (PUBLIC)
 // ======================================================
 app.get("/openapi.json", cors({ origin: "*" }), (req, res) => {
     res.json(swaggerSpec);
@@ -91,6 +91,16 @@ app.use("/api/produk", produkRoutes);
 app.use("/api/pesanan", pesananRoutes);
 app.use("/api/transaksi", transaksiRoutes);
 app.use("/api/laporan", laporanRoutes);
+
+// ======================================================
+// 404 HANDLER (WAJIB, TANPA "*")
+// ======================================================
+app.use((req, res) => {
+    res.status(404).json({
+        success: false,
+        message: "Endpoint tidak ditemukan",
+    });
+});
 
 // ======================================================
 // GLOBAL ERROR HANDLER
