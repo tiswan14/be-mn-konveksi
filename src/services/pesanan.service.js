@@ -35,7 +35,7 @@ class PesananService {
             total_harga,
             dp_wajib,
             catatan: catatan || null,
-            status_pesanan: "MENUNGGU_DP"
+            status_pesanan: "MENUNGGU_PEMBAYARAN"
         });
     }
 
@@ -106,23 +106,31 @@ class PesananService {
 
         const summary = {
             total_pesanan: 0,
-            menunggu_dp: 0,
+            menunggu_pembayaran: 0,
             diproses: 0,
-            menunggu_pelunasan: 0,
             selesai: 0,
+            dibatalkan: 0,
         };
 
         raw.forEach(item => {
             summary.total_pesanan += item._count._all;
 
-            if (item.status_pesanan === "MENUNGGU_DP") summary.menunggu_dp = item._count._all;
-            if (item.status_pesanan === "DIPROSES") summary.diproses = item._count._all;
-            if (item.status_pesanan === "MENUNGGU_PELUNASAN") summary.menunggu_pelunasan = item._count._all;
-            if (item.status_pesanan === "SELESAI") summary.selesai = item._count._all;
+            if (item.status_pesanan === "MENUNGGU_PEMBAYARAN")
+                summary.menunggu_pembayaran = item._count._all;
+
+            if (item.status_pesanan === "DIPROSES")
+                summary.diproses = item._count._all;
+
+            if (item.status_pesanan === "SELESAI")
+                summary.selesai = item._count._all;
+
+            if (item.status_pesanan === "DIBATALKAN")
+                summary.dibatalkan = item._count._all;
         });
 
         return summary;
     }
+
 
     // ===============================
     // DASHBOARD ADMIN SUMMARY
@@ -133,24 +141,32 @@ class PesananService {
 
         const summary = {
             total_pesanan: 0,
-            menunggu_dp: 0,
+            menunggu_pembayaran: 0,
             diproses: 0,
-            menunggu_pelunasan: 0,
             selesai: 0,
+            dibatalkan: 0,
             total_pendapatan: totalPendapatan
         };
 
         raw.forEach(item => {
             summary.total_pesanan += item._count._all;
 
-            if (item.status_pesanan === "MENUNGGU_DP") summary.menunggu_dp = item._count._all;
-            if (item.status_pesanan === "DIPROSES") summary.diproses = item._count._all;
-            if (item.status_pesanan === "MENUNGGU_PELUNASAN") summary.menunggu_pelunasan = item._count._all;
-            if (item.status_pesanan === "SELESAI") summary.selesai = item._count._all;
+            if (item.status_pesanan === "MENUNGGU_PEMBAYARAN")
+                summary.menunggu_pembayaran = item._count._all;
+
+            if (item.status_pesanan === "DIPROSES")
+                summary.diproses = item._count._all;
+
+            if (item.status_pesanan === "SELESAI")
+                summary.selesai = item._count._all;
+
+            if (item.status_pesanan === "DIBATALKAN")
+                summary.dibatalkan = item._count._all;
         });
 
         return summary;
     }
+
 }
 
 export default new PesananService();

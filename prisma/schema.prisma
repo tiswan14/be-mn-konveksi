@@ -89,7 +89,7 @@ model Pesanan {
 
   dp_status        StatusPembayaran @default(BELUM)
   pelunasan_status StatusPembayaran @default(BELUM)
-  status_pesanan   StatusPesanan    @default(MENUNGGU_DP)
+  status_pesanan   StatusPesanan    @default(MENUNGGU_PEMBAYARAN)
 
   tanggal_pesan DateTime @default(now())
 

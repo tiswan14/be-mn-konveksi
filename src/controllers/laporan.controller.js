@@ -1,211 +1,194 @@
 import laporanService from "../services/laporan.service.js";
+import { pesananPDF } from "../utils/pesanan.pdf.js";
+import { pesananExcel } from "../utils/pesanan.excel.js";
 
-// ===============================
-// LAPORAN CONTROLLER
-// ===============================
+import { ok, badRequest, serverError } from "../utils/response.js";
+import { requireQuery } from "../utils/validateQuery.js";
+
 class LaporanController {
+
     // ===============================
     // PENDAPATAN
     // ===============================
-    async laporanPendapatanHarian(req, res) {
+    laporanPendapatanHarian = async (req, res) => {
         try {
-            const { tanggal } = req.query;
-            if (!tanggal) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Parameter tanggal wajib diisi",
-                });
-            }
+            if (!requireQuery(res, req.query, ["tanggal"])) return;
 
-            const data = await laporanService.laporanPendapatanHarian(tanggal);
+            const data = await laporanService.laporanPendapatanHarian(
+                req.query.tanggal
+            );
 
-            res.json({
-                success: true,
-                data,
-            });
+            ok(res, data);
         } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: error.message,
-            });
+            serverError(res, error);
         }
-    }
+    };
 
-    async laporanPendapatanBulanan(req, res) {
+    laporanPendapatanBulanan = async (req, res) => {
         try {
-            const { bulan, tahun } = req.query;
-            if (!bulan || !tahun) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Parameter bulan dan tahun wajib diisi",
-                });
-            }
+            if (!requireQuery(res, req.query, ["bulan", "tahun"])) return;
 
             const data = await laporanService.laporanPendapatanBulanan(
-                Number(bulan),
-                Number(tahun)
+                Number(req.query.bulan),
+                Number(req.query.tahun)
             );
 
-            res.json({
-                success: true,
-                data,
-            });
+            ok(res, data);
         } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: error.message,
-            });
+            serverError(res, error);
         }
-    }
+    };
 
-    async laporanPendapatanTahunan(req, res) {
+    laporanPendapatanTahunan = async (req, res) => {
         try {
-            const { tahun } = req.query;
-            if (!tahun) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Parameter tahun wajib diisi",
-                });
-            }
+            if (!requireQuery(res, req.query, ["tahun"])) return;
 
             const data = await laporanService.laporanPendapatanTahunan(
-                Number(tahun)
+                Number(req.query.tahun)
             );
 
-            res.json({
-                success: true,
-                data,
-            });
+            ok(res, data);
         } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: error.message,
-            });
+            serverError(res, error);
         }
-    }
+    };
 
     // ===============================
     // PESANAN
     // ===============================
-    async laporanPesananStatus(req, res) {
+    laporanPesananStatus = async (_req, res) => {
         try {
             const data = await laporanService.laporanPesananStatus();
-            res.json({
-                success: true,
-                data,
-            });
+            ok(res, data);
         } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: error.message,
-            });
+            serverError(res, error);
         }
-    }
+    };
 
-    async laporanPesananHarian(req, res) {
+    laporanPesananHarian = async (req, res) => {
         try {
-            const { tanggal } = req.query;
-            if (!tanggal) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Parameter tanggal wajib diisi",
-                });
-            }
+            if (!requireQuery(res, req.query, ["tanggal"])) return;
 
-            const data = await laporanService.laporanPesananHarian(tanggal);
+            const data = await laporanService.laporanPesananHarian(
+                req.query.tanggal
+            );
 
-            res.json({
-                success: true,
-                data,
-            });
+            ok(res, data);
         } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: error.message,
-            });
+            serverError(res, error);
         }
-    }
+    };
 
-    async laporanPesananBulanan(req, res) {
+    laporanPesananBulanan = async (req, res) => {
         try {
-            const { bulan, tahun } = req.query;
-            if (!bulan || !tahun) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Parameter bulan dan tahun wajib diisi",
-                });
-            }
+            if (!requireQuery(res, req.query, ["bulan", "tahun"])) return;
 
             const data = await laporanService.laporanPesananBulanan(
-                Number(bulan),
-                Number(tahun)
+                Number(req.query.bulan),
+                Number(req.query.tahun)
             );
 
-            res.json({
-                success: true,
-                data,
-            });
+            ok(res, data);
         } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: error.message,
-            });
+            serverError(res, error);
         }
-    }
+    };
 
-    async laporanPesananTahunan(req, res) {
+    laporanPesananTahunan = async (req, res) => {
         try {
-            const { tahun } = req.query;
-            if (!tahun) {
+            if (!requireQuery(res, req.query, ["tahun"])) return;
+
+            const data = await laporanService.laporanPesananTahunan(
+                Number(req.query.tahun)
+            );
+
+            ok(res, data);
+        } catch (error) {
+            serverError(res, error);
+        }
+    };
+
+    // ===============================
+    // CETAK LAPORAN PESANAN
+    // ===============================
+    laporanPesananCetak = async (req, res) => {
+        try {
+            if (!requireQuery(res, req.query, ["from", "to"])) return;
+
+            const { from, to, status, format = "json" } = req.query;
+
+            const allowedStatus = [
+                "MENUNGGU_PEMBAYARAN",
+                "DIPROSES",
+                "SELESAI",
+                "DIBATALKAN"
+            ];
+
+            if (status && !allowedStatus.includes(status)) {
                 return res.status(400).json({
                     success: false,
-                    message: "Parameter tahun wajib diisi",
+                    message: "Status pesanan tidak valid",
                 });
             }
 
-            const data = await laporanService.laporanPesananTahunan(
-                Number(tahun)
-            );
 
-            res.json({
-                success: true,
-                data,
+            const result = await laporanService.laporanPesanan({
+                from,
+                to,
+                statusPesanan: status,
             });
-        } catch (error) {
-            res.status(500).json({
+
+            // ===============================
+            // MODE JSON (DEBUG)
+            // ===============================
+            if (format === "json") {
+                return res.json({
+                    success: true,
+                    mode: "json",
+                    result,
+                });
+            }
+
+            // ===============================
+            // MODE PDF
+            // ===============================
+            if (format === "pdf") {
+                return pesananPDF(res, result);
+            }
+
+            // ===============================
+            // MODE EXCEL
+            // ===============================
+            if (format === "excel") {
+                return pesananExcel(res, result);
+            }
+
+            // ===============================
+            // FORMAT TIDAK VALID
+            // ===============================
+            return res.status(400).json({
                 success: false,
-                message: error.message,
+                message: "Format tidak valid. Gunakan: json | pdf | excel",
             });
+
+        } catch (error) {
+            serverError(res, error);
         }
-    }
+    };
+
+
 }
 
 const controller = new LaporanController();
 
-// ===============================
-// NAMED EXPORT (WAJIB UNTUK ROUTES)
-// ===============================
-export const laporanPendapatanHarian =
-    controller.laporanPendapatanHarian.bind(controller);
+export const laporanPendapatanHarian = controller.laporanPendapatanHarian;
+export const laporanPendapatanBulanan = controller.laporanPendapatanBulanan;
+export const laporanPendapatanTahunan = controller.laporanPendapatanTahunan;
 
-export const laporanPendapatanBulanan =
-    controller.laporanPendapatanBulanan.bind(controller);
+export const laporanPesananStatus = controller.laporanPesananStatus;
+export const laporanPesananHarian = controller.laporanPesananHarian;
+export const laporanPesananBulanan = controller.laporanPesananBulanan;
+export const laporanPesananTahunan = controller.laporanPesananTahunan;
+export const laporanPesananCetak = controller.laporanPesananCetak;
 
-export const laporanPendapatanTahunan =
-    controller.laporanPendapatanTahunan.bind(controller);
-
-export const laporanPesananStatus =
-    controller.laporanPesananStatus.bind(controller);
-
-export const laporanPesananHarian =
-    controller.laporanPesananHarian.bind(controller);
-
-export const laporanPesananBulanan =
-    controller.laporanPesananBulanan.bind(controller);
-
-export const laporanPesananTahunan =
-    controller.laporanPesananTahunan.bind(controller);
-
-// ⛔ optional: default export boleh DIHAPUS
 export default controller;
-

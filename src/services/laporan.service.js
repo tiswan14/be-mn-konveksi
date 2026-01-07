@@ -90,6 +90,113 @@ class LaporanService {
             total_pesanan: result._count.id_pesanan || 0,
         };
     }
+    async laporanPesanan({ from, to, statusPesanan }) {
+        const startDate = new Date(`${from}T00:00:00Z`);
+        const endDate = new Date(`${to}T23:59:59Z`);
+
+        const rows = await laporanRepo.pesananDetailByRange(
+            startDate,
+            endDate,
+            statusPesanan
+        );
+
+        // ===============================
+        // SUMMARY COUNTERS
+        // ===============================
+        let totalPesanan = rows.length;
+        let totalTransaksi = 0;        // jumlah transaksi settlement
+        let totalPendapatan = 0;       // uang masuk (cash-in)
+
+        let totalNilaiPesanan = 0;     // total semua order
+        let totalSisaTagihan = 0;      // hutang customer (piutang)
+
+        const data = rows.map((item) => {
+            totalNilaiPesanan += item.total_harga;
+
+            // ===============================
+            // INIT PEMBAYARAN
+            // ===============================
+            const pembayaran = {
+                jenis: [],
+                jumlah: 0,
+                status: "BELUM BAYAR",
+            };
+
+            // ===============================
+            // TRANSAKSI SETTLEMENT (UANG MASUK)
+            // ===============================
+            if (item.transaksi?.length) {
+                item.transaksi.forEach((trx) => {
+                    if (trx.midtrans_status === "settlement") {
+                        pembayaran.jumlah += trx.jumlah;
+                        pembayaran.jenis.push(trx.jenis_pembayaran);
+
+                        totalPendapatan += trx.jumlah;
+                        totalTransaksi++;
+                    }
+                });
+            }
+
+            // ===============================
+            // STATUS PEMBAYARAN
+            // ===============================
+            if (pembayaran.jumlah > 0 && pembayaran.jumlah < item.total_harga) {
+                pembayaran.status = "SEBAGIAN";
+            } else if (pembayaran.jumlah >= item.total_harga) {
+                pembayaran.status = "LUNAS";
+            }
+
+            // ===============================
+            // HITUNG SISA TAGIHAN PER PESANAN
+            // ===============================
+            const sisaTagihan = Math.max(
+                item.total_harga - pembayaran.jumlah,
+                0
+            );
+
+            totalSisaTagihan += sisaTagihan;
+
+            // ===============================
+            // RETURN ROW
+            // ===============================
+            return {
+                customer: item.user.nama,
+                produk: item.produk.nama_produk,
+                qty: item.qty,
+
+                // 🔑 tetap sisa tagihan (biar PDF konsisten)
+                total: sisaTagihan,
+
+                pembayaran: {
+                    jenis: pembayaran.jenis.length
+                        ? [...new Set(pembayaran.jenis)].join(" + ")
+                        : "-",
+                    jumlah: pembayaran.jumlah,
+                    status: pembayaran.status,
+                },
+                status: item.status_pesanan,
+            };
+        });
+
+        return {
+            periode: { from, to },
+            summary: {
+                total_pesanan: totalPesanan,
+                total_transaksi: totalTransaksi,
+
+                // keuangan (jelas maknanya)
+                total_nilai_pesanan: totalNilaiPesanan,
+                total_pendapatan: totalPendapatan,
+                total_sisa_tagihan: totalSisaTagihan,
+            },
+            data,
+        };
+    }
+
+
+
+
+
 }
 
 export default new LaporanService();
