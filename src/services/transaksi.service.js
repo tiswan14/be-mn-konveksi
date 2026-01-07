@@ -27,10 +27,10 @@ class TransaksiService {
             include: {
                 transaksi: {
                     where: {
-                        midtrans_status: "pending"
-                    }
-                }
-            }
+                        midtrans_status: "pending",
+                    },
+                },
+            },
         });
 
         if (!pesanan) {
@@ -38,16 +38,16 @@ class TransaksiService {
         }
 
         // =======================
-        // 🔁 PAKAI ULANG TRANSAKSI PENDING (JANGAN ERROR)
+        // 🔁 PAKAI ULANG TRANSAKSI PENDING
         // =======================
         const existing = pesanan.transaksi.find(
-            t => t.jenis_pembayaran === jenis_pembayaran
+            (t) => t.jenis_pembayaran === jenis_pembayaran
         );
 
         if (existing) {
             return {
                 order_id: existing.midtrans_order_id,
-                snap_token: existing.snap_token
+                snap_token: existing.snap_token,
             };
         }
 
@@ -58,21 +58,27 @@ class TransaksiService {
         // =======================
         switch (jenis_pembayaran) {
             case "DP":
-                if (pesanan.status_pesanan !== "MENUNGGU_DP") {
-                    throw new Error("Pesanan tidak dalam status menunggu DP");
+                if (pesanan.status_pesanan !== "MENUNGGU_PEMBAYARAN") {
+                    throw new Error(
+                        "Pesanan belum dalam status menunggu pembayaran"
+                    );
                 }
                 jumlah = pesanan.dp_wajib;
                 break;
 
             case "FULL":
-                if (pesanan.status_pesanan !== "MENUNGGU_DP") {
-                    throw new Error("Pesanan tidak bisa dibayar full");
+                if (pesanan.status_pesanan !== "MENUNGGU_PEMBAYARAN") {
+                    throw new Error(
+                        "Pesanan belum dalam status menunggu pembayaran"
+                    );
                 }
                 jumlah = pesanan.total_harga;
                 break;
 
             case "PELUNASAN":
-                // pelunasan TIDAK tergantung status
+                if (pesanan.dp_status !== "VALID") {
+                    throw new Error("DP belum dibayar");
+                }
                 jumlah = pesanan.total_harga - pesanan.dp_wajib;
                 break;
 
@@ -83,19 +89,23 @@ class TransaksiService {
         // =======================
         // MIDTRANS
         // =======================
-        const order_id = this.generateOrderId(id_pesanan, jenis_pembayaran);
+        const order_id = this.generateOrderId(
+            id_pesanan,
+            jenis_pembayaran
+        );
 
         const parameter = {
             transaction_details: {
                 order_id,
-                gross_amount: jumlah
+                gross_amount: jumlah,
             },
             customer_details: {
-                first_name: `User-${pesanan.id_user}`
-            }
+                first_name: `User-${pesanan.id_user}`,
+            },
         };
 
-        const snapToken = await this.midtrans.createTransactionToken(parameter);
+        const snapToken =
+            await this.midtrans.createTransactionToken(parameter);
 
         // =======================
         // SIMPAN TRANSAKSI
@@ -105,19 +115,16 @@ class TransaksiService {
             jenis_pembayaran,
             jumlah,
             midtrans_order_id: order_id,
-            snap_token: snapToken,          // ⬅️ WAJIB
+            snap_token: snapToken,
             midtrans_payment_type: "snap",
-            midtrans_status: "pending"
+            midtrans_status: "pending",
         });
 
         return {
             order_id,
-            snap_token: snapToken
+            snap_token: snapToken,
         };
     }
-
-
-
 
     // =======================
     // HANDLE WEBHOOK MIDTRANS
@@ -127,7 +134,8 @@ class TransaksiService {
         const status = data.transaction_status;
         const paymentType = data.payment_type;
 
-        const transaksi = await transaksiRepo.findByMidtransOrderId(orderId);
+        const transaksi =
+            await transaksiRepo.findByMidtransOrderId(orderId);
         if (!transaksi) return;
 
         // UPDATE TRANSAKSI
@@ -139,17 +147,16 @@ class TransaksiService {
         });
 
         // =======================
-        // UPDATE PESANAN (FINAL & BENAR)
+        // UPDATE PESANAN
         // =======================
         if (status === "settlement") {
-
             // DP
             if (transaksi.jenis_pembayaran === "DP") {
                 await prisma.pesanan.update({
                     where: { id_pesanan: transaksi.id_pesanan },
                     data: {
                         dp_status: "VALID",
-                        status_pesanan: "DIPROSES", // ⬅️ FIX
+                        status_pesanan: "DIPROSES",
                     },
                 });
             }
@@ -160,7 +167,6 @@ class TransaksiService {
                     where: { id_pesanan: transaksi.id_pesanan },
                     data: {
                         pelunasan_status: "VALID",
-                        // status TIDAK DIUBAH
                     },
                 });
             }
@@ -172,12 +178,11 @@ class TransaksiService {
                     data: {
                         dp_status: "VALID",
                         pelunasan_status: "VALID",
-                        status_pesanan: "DIPROSES", // ⬅️ FIX
+                        status_pesanan: "DIPROSES",
                     },
                 });
             }
         }
-
 
         return transaksi;
     }

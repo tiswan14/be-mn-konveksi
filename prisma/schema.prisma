@@ -23,7 +23,7 @@ enum StatusPembayaran {
 }
 
 enum StatusPesanan {
-  MENUNGGU_DP
+  MENUNGGU_PEMBAYARAN
   DIPROSES
   SELESAI
   DIBATALKAN
@@ -77,7 +77,6 @@ model Produk {
 model Pesanan {
   id_pesanan Int @id @default(autoincrement())
 
-  // 🔑 FOREIGN KEY
   id_user   Int
   id_produk Int
 
