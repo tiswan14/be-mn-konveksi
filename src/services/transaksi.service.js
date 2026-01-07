@@ -68,12 +68,14 @@ class TransaksiService {
 
             case "FULL":
                 if (pesanan.status_pesanan !== "MENUNGGU_PEMBAYARAN") {
-                    throw new Error(
-                        "Pesanan belum dalam status menunggu pembayaran"
-                    );
+                    throw new Error("Pesanan belum dalam status menunggu pembayaran");
+                }
+                if (pesanan.dp_status === "VALID") {
+                    throw new Error("DP sudah dibayar, gunakan pelunasan");
                 }
                 jumlah = pesanan.total_harga;
                 break;
+
 
             case "PELUNASAN":
                 if (pesanan.dp_status !== "VALID") {
