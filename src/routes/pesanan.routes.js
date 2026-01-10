@@ -32,7 +32,7 @@ router.get("/:id", auth(), getDetailPesanan);
 // ===============================
 // ADMIN ONLY
 // ===============================
-router.put("/:id/status", auth(), requireAdmin, updateStatusPesanan);
+router.put("/:id/status", auth(), updateStatusPesanan);
 
 router.get("/", auth(), requireAdmin, getAllPesanan);
 
