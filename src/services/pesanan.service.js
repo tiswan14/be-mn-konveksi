@@ -66,36 +66,42 @@ class PesananService {
     // ===============================
 
     async deletePesanan({ id_pesanan, id_user, role }) {
-
         const pesanan = await pesananRepo.findByIdWithTransaksi(id_pesanan);
         if (!pesanan) throw new Error("Pesanan tidak ditemukan");
 
-        if (role === "CUSTOMER" && pesanan.id_user !== id_user) {
-            throw new Error("Tidak diizinkan menghapus pesanan ini");
+
+        // ================= STATUS PESANAN =================
+        if (["DIPROSES", "SELESAI"].includes(pesanan.status_pesanan)) {
+            throw new Error("Pesanan tidak dapat dihapus karena sudah diproses");
         }
 
-        if (
-            pesanan.status_pesanan === "DIPROSES" ||
-            pesanan.status_pesanan === "SELESAI"
-        ) {
-            throw new Error("Pesanan tidak dapat dihapus");
-        }
-
-        const sudahDibayar = pesanan.transaksi.some(
+        // ================= TRANSAKSI =================
+        const hasSettlement = pesanan.transaksi.some(
             (t) => t.midtrans_status === "settlement"
         );
-        if (sudahDibayar) {
+
+        if (hasSettlement) {
             throw new Error("Pesanan dengan pembayaran berhasil tidak dapat dihapus");
         }
 
-        // 🔥 HAPUS TRANSAKSI DULU
-        await pesananRepo.deleteTransaksiByPesanan(id_pesanan);
+        // ✅ OPTIONAL: jika ingin lebih ketat
+        const invalidPayment = pesanan.transaksi.some(
+            (t) =>
+                !["pending", "expire", "cancel", "deny"].includes(t.midtrans_status)
+        );
 
-        // 🔥 BARU HAPUS PESANAN
+        if (invalidPayment) {
+            throw new Error("Status pembayaran tidak valid untuk penghapusan");
+        }
+
+        // ================= DELETE =================
+        // 🔥 Aman: pending / expire / cancel / deny
+        await pesananRepo.deleteTransaksiByPesanan(id_pesanan);
         await pesananRepo.deleteById(id_pesanan);
 
         return { message: "Pesanan berhasil dihapus" };
     }
+
 
 
     // ===============================

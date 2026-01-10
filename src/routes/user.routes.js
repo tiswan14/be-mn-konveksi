@@ -30,7 +30,7 @@ router.get(
     userController.getDetail
 );
 
-router.patch(
+router.put(
     "/users/:id",
     auth(),
     requireAdmin,
