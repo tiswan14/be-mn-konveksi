@@ -94,19 +94,31 @@ export const updateStatusPesanan = async (req, res) => {
         const { id } = req.params;
         const { status_pesanan } = req.body;
 
-        const data = await pesananService.updateStatus(Number(id), {
-            status_pesanan,
-        });
+        if (!status_pesanan) {
+            return res.status(400).json({
+                success: false,
+                message: "Status pesanan wajib diisi",
+            });
+        }
+
+        const data = await pesananService.updateStatus(
+            Number(id),
+            { status_pesanan }
+        );
 
         return res.json({
             success: true,
-            message: "Status pesanan diperbarui",
+            message: "Status pesanan berhasil diperbarui",
             data,
         });
     } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
     }
 };
+
 
 export const getPesananSummaryUser = async (req, res) => {
     try {
