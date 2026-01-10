@@ -16,9 +16,9 @@ export const updateUserValidator = [
 
     body("no_hp")
         .optional()
-        .isNumeric()
-        .isLength({ min: 10, max: 15 })
-        .withMessage("No HP tidak valid"),
+        .isString()
+        .matches(/^[0-9]{10,15}$/)
+        .withMessage("No HP harus berupa angka 10–15 digit"),
 
     body("alamat")
         .optional()

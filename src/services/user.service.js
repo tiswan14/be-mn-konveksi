@@ -14,12 +14,20 @@ class UserService {
     }
 
     async updateUser(id_user, data) {
-        // Proteksi field sensitif
-        delete data.password;
-        delete data.email;
+        const { password, email, ...allowedData } = data;
 
-        return userRepo.update(id_user, data);
+        // Hapus field undefined
+        const cleanData = Object.fromEntries(
+            Object.entries(allowedData).filter(([_, v]) => v !== undefined)
+        );
+
+        if (Object.keys(cleanData).length === 0) {
+            throw new Error("Tidak ada data yang bisa diupdate");
+        }
+
+        return userRepo.update(id_user, cleanData);
     }
+
 }
 
 export default new UserService();

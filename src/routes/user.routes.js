@@ -31,7 +31,7 @@ router.get(
 );
 
 router.patch(
-    "/admin/users/:id",
+    "/users/:id",
     auth(),
     requireAdmin,
     userIdParamValidator,

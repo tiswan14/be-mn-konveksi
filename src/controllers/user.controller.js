@@ -25,16 +25,30 @@ class UserController {
     async update(req, res) {
         try {
             const id_user = Number(req.params.id);
+
+            if (isNaN(id_user)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "ID user tidak valid",
+                });
+            }
+
             const data = await userService.updateUser(id_user, req.body);
-            res.json({
+
+            return res.json({
                 success: true,
                 message: "User berhasil diperbarui",
                 data,
             });
         } catch (err) {
-            res.status(400).json({ success: false, message: err.message });
+            return res.status(400).json({
+                success: false,
+                message: err.message || "Gagal memperbarui user",
+            });
         }
     }
+
+
 }
 
 export default new UserController();
