@@ -22,10 +22,6 @@ export const produkValidatorCreate = [
         .notEmpty().withMessage("Harga wajib diisi")
         .isInt({ min: 1 }).withMessage("Harga harus berupa angka"),
 
-    body("estimasi_pengerjaan")
-        .notEmpty().withMessage("Estimasi pengerjaan wajib diisi")
-        .isInt({ min: 1 }).withMessage("Estimasi pengerjaan harus angka"),
-
     body("bahan").notEmpty().withMessage("Bahan wajib diisi"),
 ];
 
