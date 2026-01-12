@@ -104,14 +104,18 @@ class LaporanService {
         // SUMMARY COUNTERS
         // ===============================
         let totalPesanan = rows.length;
-        let totalTransaksi = 0;        // jumlah transaksi settlement
-        let totalPendapatan = 0;       // uang masuk (cash-in)
+        let totalTransaksi = 0;
+        let totalPendapatan = 0;
 
-        let totalNilaiPesanan = 0;     // total semua order
-        let totalSisaTagihan = 0;      // hutang customer (piutang)
+        let totalNilaiPesanan = 0;
+        let totalSisaTagihan = 0;
 
         const data = rows.map((item) => {
-            totalNilaiPesanan += item.total_harga;
+            // ===============================
+            // TOTAL PESANAN (NILAI ORDER)
+            // ===============================
+            const totalPesananItem = item.total_harga || 0;
+            totalNilaiPesanan += totalPesananItem;
 
             // ===============================
             // INIT PEMBAYARAN
@@ -123,7 +127,7 @@ class LaporanService {
             };
 
             // ===============================
-            // TRANSAKSI SETTLEMENT (UANG MASUK)
+            // TRANSAKSI SETTLEMENT
             // ===============================
             if (item.transaksi?.length) {
                 item.transaksi.forEach((trx) => {
@@ -140,32 +144,34 @@ class LaporanService {
             // ===============================
             // STATUS PEMBAYARAN
             // ===============================
-            if (pembayaran.jumlah > 0 && pembayaran.jumlah < item.total_harga) {
+            if (pembayaran.jumlah > 0 && pembayaran.jumlah < totalPesananItem) {
                 pembayaran.status = "SEBAGIAN";
-            } else if (pembayaran.jumlah >= item.total_harga) {
+            } else if (pembayaran.jumlah >= totalPesananItem && totalPesananItem > 0) {
                 pembayaran.status = "LUNAS";
             }
 
             // ===============================
-            // HITUNG SISA TAGIHAN PER PESANAN
+            // SISA TAGIHAN
             // ===============================
             const sisaTagihan = Math.max(
-                item.total_harga - pembayaran.jumlah,
+                totalPesananItem - pembayaran.jumlah,
                 0
             );
-
             totalSisaTagihan += sisaTagihan;
 
             // ===============================
-            // RETURN ROW
+            // RETURN ROW (CLEAN & EXPLICIT)
             // ===============================
             return {
                 customer: item.user.nama,
                 produk: item.produk.nama_produk,
                 qty: item.qty,
 
-                // 🔑 tetap sisa tagihan (biar PDF konsisten)
-                total: sisaTagihan,
+                harga_satuan:
+                    item.qty > 0 ? totalPesananItem / item.qty : 0,
+
+                total_pesanan: totalPesananItem,
+                sisa_tagihan: sisaTagihan,
 
                 pembayaran: {
                     jenis: pembayaran.jenis.length
@@ -183,8 +189,6 @@ class LaporanService {
             summary: {
                 total_pesanan: totalPesanan,
                 total_transaksi: totalTransaksi,
-
-                // keuangan (jelas maknanya)
                 total_nilai_pesanan: totalNilaiPesanan,
                 total_pendapatan: totalPendapatan,
                 total_sisa_tagihan: totalSisaTagihan,
@@ -192,6 +196,7 @@ class LaporanService {
             data,
         };
     }
+
 
 
 

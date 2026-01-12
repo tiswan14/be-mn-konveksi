@@ -4,64 +4,40 @@ export function pesananPDF(res, result) {
     const doc = new PDFDocument({
         size: "A4",
         layout: "landscape",
-        margin: 40
+        margin: 40,
     });
 
-    // ===============================
-    // RESPONSE HEADER
-    // ===============================
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
         "Content-Disposition",
-        "attachment; filename=laporan-pesanan-landscape.pdf"
+        "attachment; filename=laporan-pesanan.pdf"
     );
     doc.pipe(res);
 
     const { periode, summary, data } = result;
 
-    // LANDSCAPE WIDTH SETUP
     const PAGE_WIDTH = 770;
     const START_X = 40;
 
-    // ===============================
-    // HELPERS
-    // ===============================
-    const formatRupiah = (val = 0) =>
-        `Rp ${Number(val).toLocaleString("id-ID")}`;
+    const rupiah = (v = 0) =>
+        `Rp ${Number(v).toLocaleString("id-ID")}`;
 
-    const formatTanggal = (date) =>
-        new Date(date).toLocaleDateString("id-ID");
+    const tanggal = (d) =>
+        new Date(d).toLocaleDateString("id-ID");
 
-    const formatStatus = (status = "") =>
-        status
-            .toLowerCase()
-            .replace(/_/g, " ")
-            .replace(/\b\w/g, (c) => c.toUpperCase());
+    const statusLabel = (s = "") =>
+        s.replace(/_/g, " ").toUpperCase();
 
-    // ===============================
-    // HEADER
-    // ===============================
+    /* ================= HEADER ================= */
     doc.font("Helvetica-Bold")
-        .fontSize(22)
+        .fontSize(20)
         .text("LAPORAN PESANAN", { align: "center" });
 
-    doc.moveDown(0.3);
-    doc.font("Helvetica")
-        .fontSize(11)
-        .text(
-            `Periode: ${formatTanggal(periode.from)} s/d ${formatTanggal(
-                periode.to
-            )}`,
-            { align: "center" }
-        );
-
     doc.moveDown(0.4);
-    doc.fontSize(9)
-        .fillColor("#6c757d")
+    doc.font("Helvetica")
+        .fontSize(10)
         .text(
-            `Dicetak: ${formatTanggal(new Date())} ${new Date().toLocaleTimeString(
-                "id-ID"
-            )}`,
+            `Periode ${tanggal(periode.from)} s/d ${tanggal(periode.to)}`,
             { align: "center" }
         );
 
@@ -70,197 +46,107 @@ export function pesananPDF(res, result) {
         .lineTo(START_X + PAGE_WIDTH, doc.y)
         .stroke();
 
-    // ===============================
-    // SUMMARY CARD
-    // ===============================
+    /* ================= SUMMARY ================= */
     doc.moveDown(1);
 
-    const cardW = 170;
-    const cardH = 70;
-    const gap = 15;
-    const yCard = doc.y;
-
-    const summaryItems = [
-        {
-            label: "TOTAL PESANAN",
-            value: summary.total_pesanan,
-            color: "#0d6efd"
-        },
-        {
-            label: "TOTAL TRANSAKSI",
-            value: summary.total_transaksi,
-            color: "#198754"
-        },
-        {
-            label: "TOTAL NILAI PESANAN",
-            value: formatRupiah(summary.total_nilai_pesanan),
-            color: "#6610f2"
-        },
-        {
-            label: "SISA TAGIHAN",
-            value: formatRupiah(summary.total_sisa_tagihan),
-            color: "#dc3545"
-        }
-    ];
-
-    summaryItems.forEach((item, i) => {
-        const x = START_X + i * (cardW + gap);
-        doc.rect(x, yCard, cardW, cardH)
-            .fillAndStroke("#f8f9fa", "#dee2e6");
-
-        doc.font("Helvetica-Bold")
-            .fontSize(10)
-            .fillColor("#212529")
-            .text(item.label, x + 10, yCard + 10);
-
-        doc.fontSize(15)
-            .fillColor(item.color)
-            .text(item.value, x + 10, yCard + 35, {
-                width: cardW - 20
-            });
-    });
-
-    doc.moveDown(4);
-
-    // ===============================
-    // TABLE HEADER
-    // ===============================
-    const tableY = doc.y;
-    doc.rect(START_X, tableY, PAGE_WIDTH, 22).fill("#0d6efd");
+    const summaryText = [
+        `Total Pesanan: ${summary.total_pesanan}`,
+        `Total Transaksi: ${summary.total_transaksi}`,
+        `Nilai Pesanan: ${rupiah(summary.total_nilai_pesanan)}`,
+        `Pendapatan: ${rupiah(summary.total_pendapatan)}`,
+        `Sisa Tagihan: ${rupiah(summary.total_sisa_tagihan)}`,
+    ].join("   |   ");
 
     doc.font("Helvetica-Bold")
-        .fontSize(9)
-        .fillColor("#ffffff");
+        .fontSize(10)
+        .text(summaryText, START_X, doc.y, {
+            width: PAGE_WIDTH,
+            align: "center",
+        });
+
+    doc.moveDown(1.5);
+
+    /* ================= TABLE HEADER ================= */
+    const tableY = doc.y;
+
+    doc.rect(START_X, tableY, PAGE_WIDTH, 20).fill("#0d6efd");
+    doc.fillColor("#fff").fontSize(9).font("Helvetica-Bold");
 
     const cols = [
-        { text: "No", x: 45, w: 30, align: "center" },
-        { text: "Customer", x: 85, w: 160 },
-        { text: "Produk", x: 255, w: 180 },
-        { text: "Qty", x: 445, w: 40, align: "center" },
-        { text: "Total", x: 495, w: 110, align: "right" },
-        { text: "Status", x: 615, w: 120, align: "center" }
+        { t: "No", x: 45, w: 30, a: "center" },
+        { t: "Customer", x: 85, w: 150 },
+        { t: "Produk", x: 240, w: 180 },
+        { t: "Qty", x: 425, w: 40, a: "center" },
+        { t: "Total", x: 470, w: 90, a: "right" },
+        { t: "Dibayar", x: 565, w: 90, a: "right" },
+        { t: "Sisa", x: 660, w: 80, a: "right" },
+        { t: "Status", x: 745, w: 65, a: "center" },
     ];
 
     cols.forEach((c) =>
-        doc.text(c.text, c.x, tableY + 7, {
+        doc.text(c.t, c.x, tableY + 6, {
             width: c.w,
-            align: c.align || "left"
+            align: c.a || "left",
         })
     );
 
-    // ===============================
-    // TABLE BODY
-    // ===============================
-    let rowY = tableY + 22;
-    const rowH = 38;
+    /* ================= TABLE BODY ================= */
+    let rowY = tableY + 20;
+    const rowH = 24;
 
-    data.forEach((row, i) => {
-        const hasPembayaran =
-            row.pembayaran &&
-            row.pembayaran.jumlah > 0 &&
-            row.pembayaran.jenis !== "-";
+    doc.font("Helvetica").fontSize(9).fillColor("#212529");
 
+    data.forEach((r, i) => {
         if (i % 2 === 0) {
             doc.rect(START_X, rowY, PAGE_WIDTH, rowH).fill("#f8f9fa");
         }
 
-        doc.font("Helvetica")
-            .fontSize(9)
-            .fillColor("#212529");
+        doc.fillColor("#212529");
 
-        doc.text(i + 1, 45, rowY + 10, { width: 30, align: "center" });
-        doc.text(row.customer || "-", 85, rowY + 8, { width: 160 });
-        doc.text(row.produk || "-", 255, rowY + 10, { width: 180 });
-        doc.text(row.qty ?? 0, 445, rowY + 10, {
-            width: 40,
-            align: "center"
+        doc.text(i + 1, 45, rowY + 6, { width: 30, align: "center" });
+        doc.text(r.customer, 85, rowY + 6, { width: 150 });
+        doc.text(r.produk, 240, rowY + 6, { width: 180 });
+        doc.text(r.qty, 425, rowY + 6, { width: 40, align: "center" });
+        doc.text(rupiah(r.total_pesanan), 470, rowY + 6, {
+            width: 90,
+            align: "right",
         });
-        doc.text(formatRupiah(row.total), 495, rowY + 10, {
-            width: 110,
-            align: "right"
+        doc.text(rupiah(r.pembayaran.jumlah), 565, rowY + 6, {
+            width: 90,
+            align: "right",
+        });
+        doc.text(rupiah(r.sisa_tagihan), 660, rowY + 6, {
+            width: 80,
+            align: "right",
         });
 
-        // STATUS PESANAN
-        const statusLower = row.status?.toLowerCase();
         const statusColor =
-            statusLower === "diproses"
+            r.status === "SELESAI"
+                ? "#198754"
+                : r.status === "DIPROSES"
                 ? "#fd7e14"
-                : statusLower === "selesai"
-                    ? "#198754"
-                    : statusLower?.includes("menunggu")
-                        ? "#0d6efd"
-                        : "#6c757d";
+                : "#0d6efd";
 
-        doc.font("Helvetica-Bold")
-            .fillColor(statusColor)
-            .text(formatStatus(row.status), 615, rowY + 10, {
-                width: 120,
-                align: "center"
-            });
-
-        // SUB INFO PEMBAYARAN
-        doc.font("Helvetica")
-            .fontSize(8);
-
-        if (hasPembayaran) {
-            doc.fillColor("#198754").text(
-                `${formatStatus(row.pembayaran.jenis)} • ${formatStatus(
-                    row.pembayaran.status
-                )} • ${formatRupiah(row.pembayaran.jumlah)}`,
-                85,
-                rowY + 24,
-                { width: 350 }
-            );
-        } else {
-            doc.fillColor("#dc3545")
-                .text("Belum Bayar", 85, rowY + 24);
-        }
+        doc.fillColor(statusColor)
+            .font("Helvetica-Bold")
+            .text(statusLabel(r.status), 745, rowY + 6, {
+                width: 65,
+                align: "center",
+            })
+            .font("Helvetica")
+            .fillColor("#212529");
 
         rowY += rowH;
     });
 
-    // ===============================
-    // TOTAL FOOTER
-    // ===============================
-    doc.moveTo(START_X, rowY + 6)
-        .lineTo(START_X + PAGE_WIDTH, rowY + 6)
-        .stroke();
-
-    doc.font("Helvetica-Bold")
-        .fontSize(10)
-        .fillColor("#212529");
-
-
-
-    // ===============================
-    // FOOTER
-    // ===============================
-    doc.moveDown(3);
-    doc.font("Helvetica")
-        .fontSize(8)
-        .fillColor("#6c757d");
-
-    const statusCount = {};
-    data.forEach((d) => {
-        const s = formatStatus(d.status || "Lainnya");
-        statusCount[s] = (statusCount[s] || 0) + 1;
-    });
-
-    doc.text(
-        "Ringkasan Status: " +
-        Object.entries(statusCount)
-            .map(([s, c]) => `${s}: ${c}`)
-            .join(" • "),
-        START_X,
-        doc.y,
-        { width: PAGE_WIDTH }
-    );
-
-    doc.moveDown(0.5);
-    doc.text("Halaman 1 dari 1 • Sistem MN Konveksi", {
-        width: PAGE_WIDTH,
-        align: "right"
-    });
+    /* ================= FOOTER ================= */
+    doc.moveDown(1.5);
+    doc.fontSize(8)
+        .fillColor("#6c757d")
+        .text("Sistem MN Konveksi • Laporan Pesanan", {
+            width: PAGE_WIDTH,
+            align: "right",
+        });
 
     doc.end();
 }
