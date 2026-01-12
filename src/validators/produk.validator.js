@@ -45,7 +45,6 @@ export const produkValidatorUpdate = [
 
     body("deskripsi").optional().notEmpty(),
     body("harga").optional().isInt({ min: 1 }),
-    body("estimasi_pengerjaan").optional().isInt({ min: 1 }),
     body("bahan").optional().notEmpty(),
 ];
 

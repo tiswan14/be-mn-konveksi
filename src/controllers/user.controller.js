@@ -5,12 +5,25 @@ class UserController {
 
     async getAll(req, res) {
         try {
-            const data = await userService.getAllUsers();
-            res.json({ success: true, data });
+            const users = await userService.getAllUsers();
+
+            // ❌ Hilangkan semua user dengan role ADMIN
+            const filteredUsers = users.filter(
+                (user) => user.role !== "ADMIN"
+            );
+
+            return res.json({
+                success: true,
+                data: filteredUsers,
+            });
         } catch (err) {
-            res.status(500).json({ success: false, message: err.message });
+            return res.status(500).json({
+                success: false,
+                message: err.message,
+            });
         }
     }
+
 
     async getDetail(req, res) {
         try {
