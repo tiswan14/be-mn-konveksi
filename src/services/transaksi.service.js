@@ -24,13 +24,7 @@ class TransaksiService {
     async createPayment(id_pesanan, jenis_pembayaran) {
         const pesanan = await prisma.pesanan.findUnique({
             where: { id_pesanan },
-            include: {
-                transaksi: {
-                    where: {
-                        midtrans_status: "pending",
-                    },
-                },
-            },
+            include: { transaksi: true },
         });
 
         if (!pesanan) {
@@ -41,7 +35,9 @@ class TransaksiService {
         // 🔁 PAKAI ULANG TRANSAKSI PENDING
         // =======================
         const existing = pesanan.transaksi.find(
-            (t) => t.jenis_pembayaran === jenis_pembayaran
+            (t) =>
+                t.jenis_pembayaran === jenis_pembayaran &&
+                t.midtrans_status === "pending"
         );
 
         if (existing) {
@@ -51,36 +47,59 @@ class TransaksiService {
             };
         }
 
-        let jumlah;
+        let jumlah = 0;
 
         // =======================
-        // VALIDASI & HITUNG JUMLAH
+        // VALIDASI PER JENIS
         // =======================
         switch (jenis_pembayaran) {
             case "DP":
                 if (pesanan.status_pesanan !== "MENUNGGU_PEMBAYARAN") {
-                    throw new Error(
-                        "Pesanan belum dalam status menunggu pembayaran"
-                    );
+                    throw new Error("DP hanya bisa dibayar saat menunggu pembayaran");
                 }
+
+                if (pesanan.dp_status === "VALID") {
+                    throw new Error("DP sudah dibayar");
+                }
+
                 jumlah = pesanan.dp_wajib;
                 break;
 
             case "FULL":
                 if (pesanan.status_pesanan !== "MENUNGGU_PEMBAYARAN") {
-                    throw new Error("Pesanan belum dalam status menunggu pembayaran");
+                    throw new Error("Pembayaran penuh hanya bisa saat menunggu pembayaran");
                 }
+
                 if (pesanan.dp_status === "VALID") {
                     throw new Error("DP sudah dibayar, gunakan pelunasan");
                 }
+
                 jumlah = pesanan.total_harga;
                 break;
-
 
             case "PELUNASAN":
                 if (pesanan.dp_status !== "VALID") {
                     throw new Error("DP belum dibayar");
                 }
+
+                if (pesanan.pelunasan_status === "VALID") {
+                    throw new Error("Pelunasan sudah dibayar");
+                }
+
+                if (pesanan.status_pesanan === "SELESAI") {
+                    throw new Error("Pesanan sudah selesai");
+                }
+
+                const sudahLunas = pesanan.transaksi.find(
+                    (t) =>
+                        t.jenis_pembayaran === "PELUNASAN" &&
+                        t.midtrans_status === "settlement"
+                );
+
+                if (sudahLunas) {
+                    throw new Error("Pelunasan sudah lunas");
+                }
+
                 jumlah = pesanan.total_harga - pesanan.dp_wajib;
                 break;
 
@@ -91,10 +110,7 @@ class TransaksiService {
         // =======================
         // MIDTRANS
         // =======================
-        const order_id = this.generateOrderId(
-            id_pesanan,
-            jenis_pembayaran
-        );
+        const order_id = this.generateOrderId(id_pesanan, jenis_pembayaran);
 
         const parameter = {
             transaction_details: {
@@ -127,6 +143,8 @@ class TransaksiService {
             snap_token: snapToken,
         };
     }
+
+
 
     // =======================
     // HANDLE WEBHOOK MIDTRANS
