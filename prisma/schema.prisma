@@ -57,13 +57,12 @@ model User {
 }
 
 model Produk {
-  id_produk           Int     @id @default(autoincrement())
-  nama_produk         String
-  deskripsi           String
-  harga               Int
-  estimasi_pengerjaan Int
-  bahan               String
-  foto                String?
+  id_produk   Int     @id @default(autoincrement())
+  nama_produk String
+  deskripsi   String
+  harga       Int
+  bahan       String
+  foto        String?
 
   pesanan Pesanan[]
 
@@ -85,6 +84,8 @@ model Pesanan {
   total_harga  Int
   dp_wajib     Int
 
+  estimasi_hari Int @default(0)
+
   catatan String?
 
   dp_status        StatusPembayaran @default(BELUM)
@@ -101,8 +102,6 @@ model Pesanan {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  @@index([id_user])
-  @@index([id_produk])
   @@index([status_pesanan])
 }
 

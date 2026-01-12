@@ -23,6 +23,7 @@ class PesananRepository {
                 harga_satuan: true,
                 total_harga: true,
                 dp_wajib: true,
+                estimasi_hari: true,
                 catatan: true,
                 status_pesanan: true,
                 dp_status: true,
@@ -43,7 +44,6 @@ class PesananRepository {
                         id_produk: true,
                         nama_produk: true,
                         harga: true,
-                        estimasi_pengerjaan: true,
                         bahan: true,
                         foto: true
                     }
@@ -102,7 +102,6 @@ class PesananRepository {
                         id_produk: true,
                         nama_produk: true,
                         harga: true,
-                        estimasi_pengerjaan: true,
                         bahan: true,
                         foto: true
                     }
@@ -155,7 +154,6 @@ class PesananRepository {
                         id_produk: true,
                         nama_produk: true,
                         harga: true,
-                        estimasi_pengerjaan: true,
                         bahan: true,
                         foto: true
                     }

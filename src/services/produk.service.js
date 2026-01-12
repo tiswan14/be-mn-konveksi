@@ -22,7 +22,6 @@ export const produkService = {
             nama_produk: data.nama_produk,
             deskripsi: data.deskripsi,
             harga: Number(data.harga),
-            estimasi_pengerjaan: Number(data.estimasi_pengerjaan),
             bahan: data.bahan,
             foto: fotoUrl,
         });
@@ -102,8 +101,6 @@ export const produkService = {
         if (data.nama_produk !== undefined) payload.nama_produk = data.nama_produk;
         if (data.deskripsi !== undefined) payload.deskripsi = data.deskripsi;
         if (data.harga !== undefined) payload.harga = Number(data.harga);
-        if (data.estimasi_pengerjaan !== undefined)
-            payload.estimasi_pengerjaan = Number(data.estimasi_pengerjaan);
         if (data.bahan !== undefined) payload.bahan = data.bahan;
         if (fotoUrl !== undefined) payload.foto = fotoUrl;
 

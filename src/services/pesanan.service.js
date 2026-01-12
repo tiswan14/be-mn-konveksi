@@ -27,6 +27,12 @@ class PesananService {
         const total_harga = harga_satuan * qty;
         const dp_wajib = Math.ceil(total_harga * 0.5);
 
+        // ===============================
+        // ESTIMASI WAKTU PRODUKSI
+        // ===============================
+        const KAPASITAS_PRODUKSI_PER_HARI = 2; // 2 baju / hari
+        const estimasi_hari = Math.ceil(qty / KAPASITAS_PRODUKSI_PER_HARI);
+
         return pesananRepo.create({
             id_user,
             id_produk,
@@ -34,11 +40,11 @@ class PesananService {
             harga_satuan,
             total_harga,
             dp_wajib,
+            estimasi_hari, // ✅ DISIMPAN KE PESANAN
             catatan: catatan || null,
             status_pesanan: "MENUNGGU_PEMBAYARAN"
         });
     }
-
 
 
     // ===============================
